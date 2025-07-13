@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Carnet de Plantes Collaboratif</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;Carnet Plantes&quot;,&quot;short_name&quot;:&quot;Plantes&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;}" />
+  <link rel="icon" href="https://img.icons8.com/fluency/96/plant-under-sun.png">
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f4f8f3;
+      margin: 0; padding: 0;
+      color: #25422a;
+    }
+    header {
+      background: #99c47a;
+      padding: 24px 8px 12px 8px;
+      border-radius: 0 0 36px 36px;
+      box-shadow: 0 2px 12px #8fc08542;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 2.1em;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    #main {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 8px;
+    }
+    .plante-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px #bbcaa64d;
+      margin-bottom: 22px;
+      padding: 14px 14px 10px 14px;
+    }
+    .plante-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .plante-title {
+      font-weight: bold;
+      font-size: 1.3em;
+    }
+    .notes { margin-top: 8px; color: #34643c; }
+    .dates {
+      font-size: 0.98em;
+      color: #777;
+      margin-bottom: 5px;
+    }
+    .gallery {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 8px 0;
+    }
+    .photo-thumb {
+      width: 65px; height: 65px;
+      object-fit: cover;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 1px 4px #b6c5ad6e;
+      border: 1px solid #dde7d2;
+      transition: transform .15s;
+    }
+    .photo-thumb:hover { transform: scale(1.1);}
+    .actions {margin-top:8px;}
+    .btn {
+      background: #99c47a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 15px;
+      margin: 0 6px 0 0;
+      cursor: pointer;
+      font-size: 1em;
+      box-shadow: 0 1px 4px #8fc08533;
+      transition: background .2s;
+    }
+    .btn:hover { background: #73975a; }
+    .form-section {
+      background: #e8f5e1;
+      border-radius: 16px;
+      margin-bottom: 24px;
+      padding: 14px;
+      box-shadow: 0 1px 4px #b2bfa8a8;
+    }
+    .form-section input, .form-section textarea, .form-section select {
+      width: 98%;
+      padding: 8px; margin: 5px 0 12px 0;
+      border-radius: 6px; border: 1px solid #bdddb8;
+      font-size: 1em;
+    }
+    .zoom-overlay {
+      position: fixed; left:0; top:0; width:100vw; height:100vh;
+      background: #242d1fb7;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .zoom-overlay img {
+      max-width: 92vw; max-height: 85vh;
+      border-radius: 14px; box-shadow: 0 4px 16px #21311a9f;
+      background: #fff;
+    }
+    .zoom-overlay:active {cursor: zoom-out;}
+    @media (max-width: 520px) {
+      #main {padding: 2px;}
+      .plante-card, .form-section {padding: 8px;}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🌱 Carnet Plantes (collaboratif)</h1>
+    <div style="font-size:1.1em; color:#305c32;">Ajoute et partage toutes tes plantes & photos</div>
+  </header>
+  <div id="main">
+    <div class="form-section" id="addFormSection">
+      <h2>Ajouter une plante</h2>
+      <form id="addPlanteForm">
+        <input id="planteNom" placeholder="Nom de la plante" required maxlength="80"><br>
+        <textarea id="planteNotes" placeholder="Notes, évolution, besoins..." maxlength="280"></textarea><br>
+        <label>Date d’arrosage : <input type="date" id="dateArrosage"></label><br>
+        <label>Date rempotage : <input type="date" id="dateRempotage"></label><br>
+        <butto
