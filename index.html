@@ -3,9 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <title>Carnet Plantes</title>
+  <script src="https://unpkg.com/@supabase/supabase-js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; background: #fafcfb; }
+    h1 { color: #2c5f2d; }
+    ul { background: #e8f5e9; padding: 1em; border-radius: 8px; }
+    li { margin-bottom: 0.5em; }
+  </style>
 </head>
 <body>
   <h1>Carnet Plantes</h1>
-  <p>Ici commencera l’application de gestion de plantes !</p>
+  <ul id="plantes-list">
+    <li>Chargement…</li>
+  </ul>
+  <script>
+    // Remplace par TES clés du projet Supabase
+    const supabaseUrl = 'https://jooyigpbgyzqldnwldmd.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impvb3lpZ3BiZ3l6cWxkbndsZG1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MzgxODQsImV4cCI6MjA2ODAxNDE4NH0.OAGlTtJ9k0IzzET95PODjrFzFR-q6Zhv71IvJeXetQQ';
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    async function chargerPlantes() {
+      const { data, error } = await _supabase
+        .from('plantes')
+        .select('*')
+        .order('id', { ascending: false });
+      const ul = document.getElementById('plantes-list');
+      ul.innerHTML = '';
+      if (error) {
+        ul.innerHTML = '<li>Erreur : ' + error.message + '</li>';
+        return;
+      }
+      if (!data || data.length === 0) {
+        ul.innerHTML = '<li>Aucune plante trouvée.</li>';
+        return;
+      }
+      data.forEach(plante => {
+        ul.innerHTML += `<li><b>${plante.nom}</b> — Dernier arrosage : ${plante.date_arrosage ? plante.date_arrosage.split('T')[0] : 'N/A'}</li>`;
+      });
+    }
+
+    chargerPlantes();
+  </script>
 </body>
 </html>
