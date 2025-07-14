@@ -2,84 +2,267 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Carnet Plantes</title>
+  <title>Carnet Plantes Collaboratif</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://unpkg.com/@supabase/supabase-js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 2em; background: #fafcfb; }
-    h1 { color: #2c5f2d; }
-    form { background: #e8f5e9; padding: 1em; border-radius: 8px; margin-bottom: 1.5em; }
-    label { display: block; margin-bottom: 0.2em; font-weight: bold;}
-    input, textarea { width: 99%; margin-bottom: 0.8em; border-radius: 5px; border: 1px solid #ddd; padding: 0.4em;}
-    button { background: #5bc374; color: white; padding: 0.7em 2em; border-radius: 7px; border: none; font-size: 1em; cursor: pointer; }
-    ul { background: #e8f5e9; padding: 1em; border-radius: 8px; }
-    li { margin-bottom: 0.5em; }
+    body {
+      background: linear-gradient(120deg,#f7faf7 70%,#d6eedc 100%);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #25422a;
+      margin: 0; padding: 0;
+    }
+    header {
+      background: #92cfa3;
+      padding: 22px 12px 14px 12px;
+      border-radius: 0 0 32px 32px;
+      box-shadow: 0 2px 16px #aadbb063;
+      text-align: center;
+      margin-bottom: 22px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 2.2em;
+      letter-spacing: 1px;
+    }
+    #main {
+      max-width: 540px;
+      margin: 0 auto;
+      padding: 12px;
+    }
+    .form-section {
+      background: #e8f5e1;
+      border-radius: 16px;
+      margin-bottom: 32px;
+      padding: 18px 14px;
+      box-shadow: 0 1px 6px #b2bfa8a8;
+    }
+    .form-section h2 {margin-top:0;}
+    input, textarea {
+      width: 98%;
+      padding: 8px; margin: 7px 0 16px 0;
+      border-radius: 7px; border: 1px solid #bdddb8;
+      font-size: 1em;
+      font-family: inherit;
+      background: #fafdfe;
+      box-sizing: border-box;
+    }
+    .btn {
+      background: #6dbd7a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 18px;
+      margin: 0 10px 0 0;
+      cursor: pointer;
+      font-size: 1em;
+      box-shadow: 0 1px 6px #8fc08533;
+      transition: background .2s;
+    }
+    .btn:hover { background: #528b5c; }
+    .plante-card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 3px 12px #cde1c04a;
+      margin-bottom: 26px;
+      padding: 18px 18px 8px 18px;
+      position: relative;
+      transition: box-shadow 0.1s;
+    }
+    .plante-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .plante-title {
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+    .dates {
+      font-size: 0.97em;
+      color: #528b5c;
+      margin-bottom: 5px;
+      margin-top: 6px;
+    }
+    .notes { margin-top: 8px; color: #34643c; }
+    .card-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .edit-form {
+      background: #e2f3eb;
+      border-radius: 13px;
+      margin: 16px 0 0 0;
+      padding: 10px 13px 7px 13px;
+      box-shadow: 0 1px 4px #b2bfa866;
+    }
+    .delete-btn {
+      background: #f16868;
+      color: #fff;
+      margin-left: 5px;
+    }
+    .delete-btn:hover {background:#be3030;}
+    @media (max-width: 600px) {
+      #main {padding: 3px;}
+      .plante-card, .form-section {padding: 9px;}
+    }
   </style>
 </head>
 <body>
-  <h1>Carnet Plantes</h1>
-  <form id="ajout-form">
-    <label for="nom">Nom de la plante :</label>
-    <input id="nom" required autocomplete="off">
+  <header>
+    <h1>🌱 Carnet Plantes</h1>
+    <div style="font-size:1.1em; color:#305c32; margin-top:6px;">Ajoute, modifie, supprime et partage toutes tes plantes à deux !</div>
+  </header>
+  <div id="main">
+    <div class="form-section" id="addFormSection">
+      <h2>Ajouter une plante</h2>
+      <form id="addPlanteForm">
+        <input id="planteNom" placeholder="Nom de la plante" required maxlength="80"><br>
+        <textarea id="planteNotes" placeholder="Notes, évolution, besoins..." maxlength="300"></textarea><br>
+        <label>Date d’arrosage : <input type="date" id="dateArrosage"></label><br>
+        <label>Date rempotage : <input type="date" id="dateRempotage"></label><br>
+        <button type="submit" class="btn">Ajouter</button>
+      </form>
+    </div>
+    <div id="plantesList"></div>
+  </div>
 
-    <label for="notes">Notes / évolution :</label>
-    <textarea id="notes" rows="2"></textarea>
-
-    <label for="date_arrosage">Date d'arrosage :</label>
-    <input id="date_arrosage" type="date">
-
-    <label for="date_rempotage">Date rempotage :</label>
-    <input id="date_rempotage" type="date">
-
-    <button type="submit">Ajouter la plante</button>
-  </form>
-  <ul id="plantes-list">
-    <li>Chargement…</li>
-  </ul>
   <script>
-    // Tes clés Supabase
-    const supabaseUrl = 'https://jooyigpbgyzqldnwldmd.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impvb3lpZ3BiZ3l6cWxkbndsZG1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MzgxODQsImV4cCI6MjA2ODAxNDE4NH0.OAGlTtJ9k0IzzET95PODjrFzFR-q6Zhv71IvJeXetQQ';
-    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    // ---- CONFIG SUPABASE ----
+    const supabaseUrl = "https://jooyigpbgyzqldnwldmd.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impvb3lpZ3BiZ3l6cWxkbndsZG1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MzgxODQsImV4cCI6MjA2ODAxNDE4NH0.OAGlTtJ9k0IzzET95PODjrFzFR-q6Zhv71IvJeXetQQ";
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    async function chargerPlantes() {
-      const { data, error } = await _supabase
+    let plantes = [];
+    let editIndex = null; // Pour savoir quelle carte est en édition
+
+    async function loadData() {
+      let { data: p, error } = await supabase
         .from('plantes')
         .select('*')
         .order('id', { ascending: false });
-      const ul = document.getElementById('plantes-list');
-      ul.innerHTML = '';
       if (error) {
-        ul.innerHTML = '<li>Erreur : ' + error.message + '</li>';
+        document.getElementById('plantesList').innerHTML = `<div style="color:red">Erreur : ${error.message}</div>`;
         return;
       }
-      if (!data || data.length === 0) {
-        ul.innerHTML = '<li>Aucune plante trouvée.</li>';
+      plantes = p || [];
+      renderPlantes();
+    }
+
+    function formatDate(d) {
+      if (!d) return "";
+      const date = new Date(d);
+      if (isNaN(date)) return "";
+      return date.toLocaleDateString();
+    }
+
+    function renderPlantes() {
+      const list = document.getElementById('plantesList');
+      list.innerHTML = "";
+      if (plantes.length === 0) {
+        list.innerHTML = "<div style='margin-top:32px;color:#7fc17f;text-align:center'>Aucune plante pour l’instant.<br>Ajoute ta première plante !</div>";
         return;
       }
-      data.forEach(plante => {
-        ul.innerHTML += `<li><b>${plante.nom}</b> — Dernier arrosage : ${plante.date_arrosage ? plante.date_arrosage.split('T')[0] : 'N/A'}<br>
-        <i>${plante.notes || ''}</i></li>`;
+      plantes.forEach((plante, idx) => {
+        // Edition ?
+        if (editIndex === idx) {
+          list.innerHTML += `
+          <div class="plante-card">
+            <div class="plante-header">
+              <span class="plante-title">📝 Modifier ${plante.nom}</span>
+            </div>
+            <form class="edit-form" onsubmit="return saveEdit(event,${plante.id},${idx})">
+              <label>Nom : <input id="editNom${plante.id}" value="${plante.nom||''}" maxlength="80" required></label><br>
+              <label>Notes :<br><textarea id="editNotes${plante.id}" maxlength="300">${plante.notes||''}</textarea></label><br>
+              <label>Date arrosage : <input type="date" id="editArrosage${plante.id}" value="${plante.date_arrosage ? plante.date_arrosage.split('T')[0] : ''}"></label><br>
+              <label>Date rempotage : <input type="date" id="editRempotage${plante.id}" value="${plante.date_rempotage ? plante.date_rempotage.split('T')[0] : ''}"></label><br>
+              <button class="btn" type="submit">Sauvegarder</button>
+              <button class="btn" type="button" onclick="cancelEdit()">Annuler</button>
+            </form>
+          </div>`;
+        } else {
+          list.innerHTML += `
+          <div class="plante-card">
+            <div class="plante-header">
+              <span class="plante-title">${plante.nom ? "🌿 "+plante.nom : "Plante"}</span>
+              <div>
+                <button class="btn" onclick="editPlante(${idx})">Modifier</button>
+                <button class="btn delete-btn" onclick="deletePlante(${plante.id})">Supprimer</button>
+              </div>
+            </div>
+            <div class="dates">
+              Ajoutée le : ${formatDate(plante.date_ajout)}
+              ${plante.date_arrosage ? `<br>Dernier arrosage : <b>${formatDate(plante.date_arrosage)}</b>` : ""}
+              ${plante.date_rempotage ? `<br>Dernier rempotage : <b>${formatDate(plante.date_rempotage)}</b>` : ""}
+            </div>
+            <div class="notes">${plante.notes ? plante.notes : ""}</div>
+          </div>
+        `;
+        }
       });
     }
 
-    // Soumission du formulaire
-    document.getElementById('ajout-form').onsubmit = async function(event) {
-      event.preventDefault();
-      const nom = document.getElementById('nom').value;
-      const notes = document.getElementById('notes').value;
-      const date_arrosage = document.getElementById('date_arrosage').value;
-      const date_rempotage = document.getElementById('date_rempotage').value;
-      const { error } = await _supabase.from('plantes').insert([
-        {
-          nom, notes, date_arrosage: date_arrosage || null, date_rempotage: date_rempotage || null
-        }
-      ]);
-      if (error) alert('Erreur : ' + error.message);
-      document.getElementById('ajout-form').reset();
-      chargerPlantes();
+    // ----- AJOUT -----
+    document.getElementById('addPlanteForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const nom = document.getElementById('planteNom').value;
+      const notes = document.getElementById('planteNotes').value;
+      const date_ajout = new Date();
+      const date_arrosage = document.getElementById('dateArrosage').value ? new Date(document.getElementById('dateArrosage').value) : null;
+      const date_rempotage = document.getElementById('dateRempotage').value ? new Date(document.getElementById('dateRempotage').value) : null;
+      const { error } = await supabase
+        .from('plantes')
+        .insert([{ nom, notes, date_ajout, date_arrosage, date_rempotage }]);
+      if (error) { alert("Erreur ajout plante : " + error.message); return; }
+      await loadData();
+      document.getElementById('addPlanteForm').reset();
     };
 
-    chargerPlantes();
+    // ---- SUPPRIMER ----
+    async function deletePlante(id) {
+      if (!confirm("Supprimer cette plante ? Cette action est définitive.")) return;
+      await supabase.from('plantes').delete().eq('id', id);
+      await loadData();
+    }
+
+    // ---- ÉDITION ----
+    window.editPlante = function(idx) {
+      editIndex = idx;
+      renderPlantes();
+      // Scroll pour bien voir le form si mobile
+      setTimeout(()=>{window.scrollTo({top:0,left:0,behavior:'smooth'});},200);
+    }
+    window.cancelEdit = function() {
+      editIndex = null;
+      renderPlantes();
+    }
+    window.saveEdit = async function(e, id, idx) {
+      e.preventDefault();
+      const nom = document.getElementById('editNom'+id).value;
+      const notes = document.getElementById('editNotes'+id).value;
+      const date_arrosage = document.getElementById('editArrosage'+id).value;
+      const date_rempotage = document.getElementById('editRempotage'+id).value;
+      const { error } = await supabase
+        .from('plantes')
+        .update({
+          nom, notes,
+          date_arrosage: date_arrosage||null,
+          date_rempotage: date_rempotage||null
+        }).eq('id', id);
+      if (error) { alert("Erreur modif : " + error.message); return; }
+      editIndex = null;
+      await loadData();
+    }
+
+    // ---- SYNCHRO TEMPS RÉEL
+    supabase.channel('realtime-plantes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'plantes' }, payload => loadData())
+      .subscribe();
+
+    // ---- INIT
+    loadData();
   </script>
 </body>
 </html>
