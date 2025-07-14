@@ -6,9 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* ... (tes styles inchangés ici, tu peux garder tout le bloc <style> tel quel) ... */
-    body { font-family: 'Montserrat', Arial, sans-serif; margin:0; padding:0; background:#f5faf6; color:#224c30;}
-    /* ... (raccourci ici pour la lisibilité mais mets tout ton CSS !) ... */
+    /* ... (Garde tout ton CSS, inchangé) ... */
+    /* Je l'ai coupé ici pour la lisibilité, mais tu peux le laisser tel quel */
   </style>
 </head>
 <body>
@@ -30,11 +29,11 @@
   <div class="modal-date" id="modalDate"></div>
   <button class="modal-close" onclick="closeModal(event)">Fermer</button>
 </div>
-
-<!-- CHARGEMENT DES SCRIPTS UNIQUEMENT ICI, EN BAS -->
+<!-- Charge Supabase AVANT ton JS -->
 <script src="https://unpkg.com/@supabase/supabase-js"></script>
 <script>
-const supabase = supabase.createClient(
+// Utilise un nom différent pour le client
+const supabaseClient = supabase.createClient(
   "https://jooyigpbgyzqldnwldmd.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impvb3lpZ3BiZ3l6cWxkbndsZG1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MzgxODQsImV4cCI6MjA2ODAxNDE4NH0.OAGlTtJ9k0IzzET95PODjrFzFR-q6Zhv71IvJeXetQQ"
 );
@@ -43,11 +42,11 @@ const BUCKET = "plantes-photos";
 let plantes = [], photosByPlante = {}, currentPlante = null;
 
 async function loadPlantes() {
-  let { data } = await supabase.from('plantes').select('*').order('id', {ascending:false});
+  let { data } = await supabaseClient.from('plantes').select('*').order('id', {ascending:false});
   plantes = data || [];
 }
 async function loadPhotos() {
-  let { data } = await supabase.from('photos').select('*');
+  let { data } = await supabaseClient.from('photos').select('*');
   photosByPlante = {};
   (data||[]).forEach(photo => {
     if (!photosByPlante[photo.plante_id]) photosByPlante[photo.plante_id] = [];
@@ -140,7 +139,7 @@ async function savePlante(ev) {
   let notes = document.getElementById('notesAjout').value.trim();
   let date_arrosage = document.getElementById('arrosageAjout').value;
   let date_rempotage = document.getElementById('rempotageAjout').value;
-  let { error } = await supabase.from("plantes").insert({
+  let { error } = await supabaseClient.from("plantes").insert({
     nom, notes, date_arrosage, date_rempotage
   });
   if (error) return alert("Erreur: "+error.message);
@@ -196,10 +195,10 @@ function showFiche(id) {
     const description = document.getElementById('descInput').value.trim();
     if(!file) return;
     const filePath = `${id}/${Date.now()}_${file.name.replace(/[^a-z0-9_.-]/gi, '_')}`;
-    let { error } = await supabase.storage.from(BUCKET).upload(filePath, file, { upsert:false });
+    let { error } = await supabaseClient.storage.from(BUCKET).upload(filePath, file, { upsert:false });
     if(error){ alert("Erreur upload: "+error.message); return; }
-    const { data } = supabase.storage.from(BUCKET).getPublicUrl(filePath);
-    await supabase.from("photos").insert({
+    const { data } = supabaseClient.storage.from(BUCKET).getPublicUrl(filePath);
+    await supabaseClient.from("photos").insert({
       plante_id: id, url: data.publicUrl, storage_key: filePath,
       description, date_ajout: new Date()
     });
@@ -211,7 +210,7 @@ async function saveEditFiche() {
   let notes = document.getElementById('ficheNotes').value.trim();
   let date_arrosage = document.getElementById('ficheArrosage').value;
   let date_rempotage = document.getElementById('ficheRempotage').value;
-  let { error } = await supabase.from("plantes").update({
+  let { error } = await supabaseClient.from("plantes").update({
     notes, date_arrosage, date_rempotage
   }).eq("id", currentPlante.id);
   if (error) return alert("Erreur: "+error.message);
@@ -220,21 +219,21 @@ async function saveEditFiche() {
 async function editPlante(id) { showFiche(id); }
 async function deletePlante(id) {
   if(!confirm("Supprimer cette plante et toutes ses photos ?")) return;
-  await supabase.from("photos").delete().eq("plante_id",id);
-  await supabase.from("plantes").delete().eq("id",id);
+  await supabaseClient.from("photos").delete().eq("plante_id",id);
+  await supabaseClient.from("plantes").delete().eq("id",id);
   await refreshAll();
 }
 async function updateArrosage(id,date) {
-  await supabase.from("plantes").update({date_arrosage:date}).eq("id",id);
+  await supabaseClient.from("plantes").update({date_arrosage:date}).eq("id",id);
   await refreshAll();
 }
 async function updateRempotage(id,date) {
-  await supabase.from("plantes").update({date_rempotage:date}).eq("id",id);
+  await supabaseClient.from("plantes").update({date_rempotage:date}).eq("id",id);
   await refreshAll();
 }
 async function deletePhoto(photo_id, plante_id){
   if(!confirm("Supprimer cette photo ?")) return;
-  await supabase.from("photos").delete().eq("id",photo_id);
+  await supabaseClient.from("photos").delete().eq("id",photo_id);
   await loadPhotos(); showFiche(plante_id);
 }
 function openModal(url, desc, date) {
