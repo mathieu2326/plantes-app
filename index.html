@@ -68,12 +68,16 @@
       padding: 18px 18px 8px 18px;
       position: relative;
       transition: box-shadow 0.1s;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
     }
     .plante-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 6px;
+      width: 100%;
     }
     .plante-title {
       font-weight: bold;
@@ -104,6 +108,28 @@
       margin-left: 5px;
     }
     .delete-btn:hover {background:#be3030;}
+    .plante-checkbox {
+      margin: 0 8px 0 0;
+      accent-color: #6dbd7a;
+      width: 20px; height: 20px;
+      transform: translateY(5px);
+    }
+    .select-bar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: #d6eedc;
+      padding: 9px 12px 7px 12px;
+      border-radius: 0 0 18px 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px #bdddb899;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      justify-content: flex-start;
+      font-size: 1.15em;
+    }
+    .select-bar .btn {margin:0;}
     @media (max-width: 600px) {
       #main {padding: 3px;}
       .plante-card, .form-section {padding: 9px;}
@@ -113,7 +139,7 @@
 <body>
   <header>
     <h1>🌱 Carnet Plantes</h1>
-    <div style="font-size:1.1em; color:#305c32; margin-top:6px;">Ajoute, modifie, supprime et partage toutes tes plantes à deux !</div>
+    <div style="font-size:1.1em; color:#305c32; margin-top:6px;">Ajoute, modifie, supprime, sélectionne et arrose plusieurs plantes en 1 clic !</div>
   </header>
   <div id="main">
     <div class="form-section" id="addFormSection">
@@ -126,6 +152,7 @@
         <button type="submit" class="btn">Ajouter</button>
       </form>
     </div>
+    <div id="selectBar" style="display:none"></div>
     <div id="plantesList"></div>
   </div>
 
@@ -137,18 +164,20 @@
 
     let plantes = [];
     let editIndex = null; // Pour savoir quelle carte est en édition
+    let selectedPlantes = new Set();
 
-    async function loadData() {
-      let { data: p, error } = await supabase
-        .from('plantes')
-        .select('*')
-        .order('id', { ascending: false });
-      if (error) {
-        document.getElementById('plantesList').innerHTML = `<div style="color:red">Erreur : ${error.message}</div>`;
+    // ---- AFFICHAGE ----
+    function renderSelectBar() {
+      const bar = document.getElementById('selectBar');
+      if (selectedPlantes.size === 0) {
+        bar.style.display = "none";
+        bar.innerHTML = "";
         return;
       }
-      plantes = p || [];
-      renderPlantes();
+      bar.style.display = "flex";
+      bar.innerHTML = `<span>${selectedPlantes.size} plante(s) sélectionnée(s)</span>
+        <button class="btn" onclick="arroserSelection()">💧 Arroser aujourd’hui</button>
+        <button class="btn delete-btn" onclick="clearSelection()">Annuler la sélection</button>`;
     }
 
     function formatDate(d) {
@@ -185,23 +214,53 @@
         } else {
           list.innerHTML += `
           <div class="plante-card">
-            <div class="plante-header">
-              <span class="plante-title">${plante.nom ? "🌿 "+plante.nom : "Plante"}</span>
-              <div>
-                <button class="btn" onclick="editPlante(${idx})">Modifier</button>
-                <button class="btn delete-btn" onclick="deletePlante(${plante.id})">Supprimer</button>
+            <input type="checkbox" class="plante-checkbox" id="checkbox${plante.id}" data-idx="${idx}" ${selectedPlantes.has(plante.id) ? 'checked' : ''} onclick="togglePlanteSelect(${plante.id})">
+            <div style="flex:1">
+              <div class="plante-header">
+                <span class="plante-title">${plante.nom ? "🌿 "+plante.nom : "Plante"}</span>
+                <div>
+                  <button class="btn" onclick="editPlante(${idx})">Modifier</button>
+                  <button class="btn delete-btn" onclick="deletePlante(${plante.id})">Supprimer</button>
+                </div>
               </div>
+              <div class="dates">
+                Ajoutée le : ${formatDate(plante.date_ajout)}
+                ${plante.date_arrosage ? `<br>Dernier arrosage : <b>${formatDate(plante.date_arrosage)}</b>` : ""}
+                ${plante.date_rempotage ? `<br>Dernier rempotage : <b>${formatDate(plante.date_rempotage)}</b>` : ""}
+              </div>
+              <div class="notes">${plante.notes ? plante.notes : ""}</div>
             </div>
-            <div class="dates">
-              Ajoutée le : ${formatDate(plante.date_ajout)}
-              ${plante.date_arrosage ? `<br>Dernier arrosage : <b>${formatDate(plante.date_arrosage)}</b>` : ""}
-              ${plante.date_rempotage ? `<br>Dernier rempotage : <b>${formatDate(plante.date_rempotage)}</b>` : ""}
-            </div>
-            <div class="notes">${plante.notes ? plante.notes : ""}</div>
           </div>
         `;
         }
       });
+      renderSelectBar();
+    }
+
+    // ---- SÉLECTION ----
+    window.togglePlanteSelect = function(id) {
+      if (selectedPlantes.has(id)) selectedPlantes.delete(id);
+      else selectedPlantes.add(id);
+      renderPlantes();
+    }
+    window.clearSelection = function() {
+      selectedPlantes.clear();
+      renderPlantes();
+    }
+
+    // ---- ARROSAGE GROUPE ----
+    window.arroserSelection = async function() {
+      if (selectedPlantes.size === 0) return;
+      if (!confirm("Mettre à jour la date d’arrosage de toutes les plantes sélectionnées à aujourd’hui ?")) return;
+      const ids = Array.from(selectedPlantes);
+      const today = new Date().toISOString();
+      const { error } = await supabase
+        .from('plantes')
+        .update({ date_arrosage: today })
+        .in('id', ids);
+      if (error) { alert("Erreur lors de l’arrosage groupé : " + error.message); return; }
+      selectedPlantes.clear();
+      await loadData();
     }
 
     // ----- AJOUT -----
@@ -231,7 +290,6 @@
     window.editPlante = function(idx) {
       editIndex = idx;
       renderPlantes();
-      // Scroll pour bien voir le form si mobile
       setTimeout(()=>{window.scrollTo({top:0,left:0,behavior:'smooth'});},200);
     }
     window.cancelEdit = function() {
@@ -257,6 +315,18 @@
     }
 
     // ---- SYNCHRO TEMPS RÉEL
+    async function loadData() {
+      let { data: p, error } = await supabase
+        .from('plantes')
+        .select('*')
+        .order('id', { ascending: false });
+      if (error) {
+        document.getElementById('plantesList').innerHTML = `<div style="color:red">Erreur : ${error.message}</div>`;
+        return;
+      }
+      plantes = p || [];
+      renderPlantes();
+    }
     supabase.channel('realtime-plantes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'plantes' }, payload => loadData())
       .subscribe();
