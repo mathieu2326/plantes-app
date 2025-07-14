@@ -1,627 +1,357 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Carnet Plantes Collaboratif</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap">
+  <meta charset="UTF-8">
+  <title>Carnet Plantes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
-      margin: 0;
-      font-family: 'Montserrat', Arial, sans-serif;
-      background: linear-gradient(120deg, #f7faf7 60%, #e0f7e9 100%);
-      color: #26422a;
-      min-height: 100vh;
+      font-family: 'Nunito', sans-serif;
+      margin: 0; padding: 0;
+      background: #f6fcf6;
     }
     header {
-      background: #92cfa3;
-      border-radius: 0 0 36px 36px;
-      padding: 24px 10px 18px 10px;
+      background: #51b86c;
+      color: white;
+      padding: 1.5rem 0 1rem 0;
       text-align: center;
-      box-shadow: 0 2px 18px #aadbb063;
+      border-radius: 0 0 2rem 2rem;
+      margin-bottom: 1rem;
     }
-    h1 {
-      margin: 0;
-      font-weight: 700;
-      font-size: 2.3em;
-      letter-spacing: 1px;
-      color: #245735;
+    .container {
+      max-width: 550px;
+      margin: auto;
+      padding: 1rem;
     }
-    .subtitle {
-      color: #377a49;
-      font-size: 1.18em;
-      margin-top: 7px;
-    }
-    #main {
-      max-width: 850px;
-      margin: 0 auto;
-      padding: 24px 9px 64px 9px;
-      min-height: 60vh;
-    }
-    .grid-plantes {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 22px;
-      margin-top: 22px;
-    }
-    .plante-card {
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 3px 12px #cde1c04a;
-      padding: 17px 15px 14px 15px;
-      transition: box-shadow 0.15s;
-      position: relative;
+    .plant-card {
       display: flex;
-      flex-direction: column;
-      cursor: pointer;
-      min-height: 172px;
-    }
-    .plante-mini {
-      width: 72px; height: 72px;
-      object-fit: cover;
-      border-radius: 50%;
-      box-shadow: 0 1px 8px #b2bfa866;
-      background: #eafaea;
-      margin-bottom: 9px;
-      align-self: center;
-    }
-    .no-photo {
-      display: flex;
-      width: 72px; height: 72px;
-      border-radius: 50%; background: #eafaea;
-      align-items: center; justify-content: center;
-      font-size: 2.7em; color: #a6d1af;
-      box-shadow: 0 1px 8px #b2bfa866;
-      margin-bottom: 9px;
-      align-self: center;
-    }
-    .plante-nom {
-      font-size: 1.1em;
-      font-weight: bold;
-      margin-bottom: 4px;
-      color: #26422a;
-      text-align: center;
-      letter-spacing: 0.2px;
-    }
-    .badge-arrosage {
-      background: #55ba63;
-      color: #fff;
-      border-radius: 10px;
-      font-size: 0.96em;
-      padding: 2px 10px;
-      margin-left: 8px;
-      font-weight: 600;
-    }
-    .plante-info {
-      font-size: 0.97em;
-      color: #437c56;
-      margin-bottom: 5px;
-      text-align: center;
-    }
-    .btn-card {
-      margin-top: auto;
-      background: #e0f7e9;
-      color: #216740;
-      border: none;
-      border-radius: 9px;
-      padding: 7px 0;
-      cursor: pointer;
-      font-size: 1em;
-      width: 100%;
-      margin-bottom: 3px;
-      font-weight: 600;
-      transition: background .17s;
-    }
-    .btn-card:hover { background: #b6f2c7; }
-    .card-actions {
-      display: flex; gap: 7px; margin-top: 6px; justify-content: center;
-    }
-    .delete-btn {
-      background: #f16868;
-      color: #fff;
-      border: none;
-      border-radius: 9px;
-      padding: 6px 13px;
-      cursor: pointer;
-      font-size: 0.98em;
-      font-weight: 600;
-      box-shadow: 0 1px 6px #e0777750;
-      transition: background .17s;
-    }
-    .delete-btn:hover {background:#be3030;}
-    .search-row {
-      display: flex;
-      gap: 13px;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
       align-items: center;
-      justify-content: space-between;
-    }
-    .search-input {
-      flex:1;
-      min-width: 180px;
-      max-width: 290px;
-      font-size: 1.05em;
-      padding: 6px 10px;
-      border-radius: 8px;
-      border: 1px solid #bdddb8;
-      margin-right: 12px;
-    }
-    .select-sort {
-      font-size: 1.02em;
-      padding: 6px 12px;
-      border-radius: 8px;
-      border: 1px solid #bdddb8;
-      background: #fafdfe;
-      color: #3e6c4d;
-    }
-    .add-btn {
-      position: fixed;
-      bottom: 34px;
-      right: 34px;
-      background: #72d482;
-      color: #fff;
-      border: none;
-      border-radius: 50%;
-      box-shadow: 0 2px 18px #aadbb043;
-      width: 65px; height: 65px;
-      font-size: 2.35em;
-      display: flex; align-items: center; justify-content: center;
+      background: #e8fbe4;
+      border-radius: 1rem;
+      padding: 0.8rem;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 2px 8px #0001;
+      transition: box-shadow .2s;
       cursor: pointer;
-      transition: background .19s;
-      z-index: 200;
     }
-    .add-btn:hover { background: #4fa262; }
-    .fiche-bg {
-      background: #f7faf7f7;
-      border-radius: 19px;
-      box-shadow: 0 3px 18px #b2bfa84b;
-      padding: 23px 17px 13px 17px;
-      max-width: 500px;
-      margin: 33px auto 0 auto;
-      position: relative;
-      min-height: 340px;
+    .plant-card:hover { box-shadow: 0 4px 12px #0002; }
+    .plant-photo-thumb {
+      width: 60px; height: 60px; object-fit: cover;
+      border-radius: 1rem; background: #fff;
+      margin-right: 1rem;
+      border: 1.5px solid #b4dfbe;
     }
-    .fiche-title {
-      font-size: 1.35em;
-      font-weight: 700;
-      margin-bottom: 7px;
-      color: #25422a;
-      text-align: center;
+    .plant-main {
+      flex: 1;
     }
-    .fiche-mini {
-      width: 102px; height: 102px;
-      object-fit: cover;
-      border-radius: 19px;
-      background: #eafaea;
-      box-shadow: 0 1px 12px #b2bfa866;
-      display: block; margin: 0 auto 14px auto;
-    }
-    .fiche-info {
-      text-align: center;
-      color: #437c56;
-      font-size: 1em;
-      margin-bottom: 7px;
-    }
-    .fiche-notes {
-      margin: 12px 0 10px 0;
-      color: #34643c;
-      background: #eafaea;
-      border-radius: 8px;
-      padding: 7px 10px;
-      min-height: 32px;
-      font-size: 1.01em;
-    }
-    .fiche-actions {
-      display: flex; gap: 8px; justify-content: center;
-      margin-bottom: 10px;
-    }
-    .fiche-btn {
-      background: #7dd8a3;
-      color: #fff;
+    .btn-add, .btn-back, .btn-delete {
+      background: #51b86c;
+      color: white;
       border: none;
-      border-radius: 8px;
-      padding: 7px 16px;
+      border-radius: 2rem;
+      padding: 0.6rem 1.4rem;
+      font-size: 1rem;
+      margin: 0.3rem 0.4rem;
       cursor: pointer;
-      font-size: 1.08em;
-      font-weight: 600;
-      box-shadow: 0 1px 8px #b2bfa866;
-      transition: background .17s;
+      transition: background .2s;
     }
-    .fiche-btn:hover {background: #47b16c;}
-    .gallery-title {
-      margin-top: 15px; margin-bottom: 4px; font-weight: 600;
-      font-size: 1.11em; color: #377a49;
-      text-align: center;
-    }
+    .btn-add:hover { background: #388e4e; }
+    .btn-back { background: #dedede; color: #168942; }
+    .btn-delete { background: #eb5b5b; }
     .gallery {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 7px;
+      gap: 1rem;
+      margin-top: 1rem;
     }
-    .gallery-item {
-      position: relative;
-      display: inline-block;
+    .gallery-img-block {
+      width: 120px;
+      display: flex; flex-direction: column; align-items: center;
+      background: #f6f9f6;
+      border-radius: 1rem; box-shadow: 0 1px 3px #0001;
+      padding: 0.5rem 0.4rem;
+      margin-bottom: 0.5rem;
     }
-    .gallery img {
-      border-radius: 10px;
-      width: 76px; height: 76px;
-      object-fit: cover;
+    .gallery-img {
+      width: 95px; height: 95px; object-fit: cover;
+      border-radius: 0.8rem;
       cursor: pointer;
-      border: 2px solid #c2e3ca;
-      background: #eafaea;
+      margin-bottom: 0.3rem;
+      border: 1px solid #bde3ca;
+      transition: box-shadow .2s;
     }
-    .del-photo-btn {
-      position: absolute;
-      top: -8px; right: -8px;
-      background: #f16868;
-      color: #fff; font-weight: bold;
-      border: none;
-      width: 23px; height: 23px;
-      font-size: 1.15em;
-      border-radius: 50%;
-      cursor: pointer; padding:0;
-      z-index: 3;
-    }
-    .photo-desc {
-      font-size: 0.97em;
-      color: #437c56;
-      background: #eafaea;
-      border-radius: 6px;
-      padding: 2px 5px;
-      margin: 4px 0 2px 0;
-      text-align: center;
-    }
-    .gallery-counter {
-      margin: 4px 0 12px 0;
-      color: #457853;
-      font-size: 1.02em;
-      font-weight: 500;
-      text-align: center;
-    }
-    .photo-date {
-      font-size: 0.88em;
-      color: #7fa88f;
-      margin-bottom: 2px;
-      text-align: center;
-    }
-    .modal-bg {
-      position: fixed;
-      top:0; left:0; width:100vw; height:100vh;
-      background: rgba(34, 52, 30, 0.95);
-      display:flex;align-items:center;justify-content:center;
-      flex-direction:column;
-      z-index: 9999;
-      animation: modalFadeIn .18s;
-    }
-    @keyframes modalFadeIn {
-      from { opacity:0; } to { opacity:1; }
-    }
-    .modal-img {
-      max-width: 92vw; max-height: 82vh;
-      border-radius: 16px;
-      box-shadow: 0 4px 24px #86a68f;
-      background: #fff;
-      margin-bottom: 17px;
-    }
-    .modal-desc, .modal-date {
-      color: #fff; text-align: center;
-      margin-bottom: 8px; font-size:1.07em;
-    }
-    .modal-close {
-      background: #fff; color:#285c34;
-      border: none;
-      border-radius: 10px;
-      font-size: 1.19em;
-      font-weight: 700;
-      padding: 7px 19px;
-      cursor: pointer;
-      margin-top: 13px;
-      box-shadow: 0 2px 8px #285c3427;
-      transition: background .15s;
-    }
-    .modal-close:hover {background:#e0f7e9;}
-    /* Formulaire ajout / édition */
-    .form-section {
-      background: #e8f5e1;
-      border-radius: 16px;
-      margin-bottom: 32px;
-      padding: 18px 14px 9px 14px;
-      box-shadow: 0 1px 6px #b2bfa8a8;
-      max-width: 420px;
-      margin-left:auto;margin-right:auto;
-    }
-    input, textarea, select {
-      width: 97%;
-      padding: 8px; margin: 7px 0 16px 0;
-      border-radius: 7px; border: 1px solid #bdddb8;
-      font-size: 1em;
-      font-family: inherit;
-      background: #fafdfe;
-      box-sizing: border-box;
-    }
-    label {font-size:1.05em;}
-    .no-plantes {
-      color: #87b29a;
-      font-size: 1.2em;
-      text-align: center;
-      margin-top: 44px;
-      letter-spacing: .5px;
+    .gallery-img:hover { box-shadow: 0 4px 8px #b2ffd8aa; }
+    .gallery-caption { font-size: .90em; color: #334; margin-bottom: 2px; text-align: center;}
+    .gallery-date { font-size: .80em; color: #888; margin-bottom: 4px; text-align: center;}
+    .gallery-delete-btn {
+      background: #eb5b5b; color: white; border: none; border-radius: 100px; cursor: pointer;
+      font-size: 1em; margin-bottom: 3px; padding: 2px 9px;
+      align-self: flex-end;
     }
     @media (max-width: 650px) {
-      #main {padding: 2px;}
-      .grid-plantes {gap: 13px;}
-      .form-section {padding: 9px;}
-      .fiche-bg {padding:11px;}
-      .gallery img {width: 54px; height:54px;}
-      .fiche-mini {width: 72px; height: 72px;}
-      .add-btn {width: 54px; height:54px;font-size:1.6em;}
+      .container { padding: 0.2rem; }
+      .gallery-img-block { width: 45vw; min-width: 80px;}
+      .gallery-img { width: 39vw; height: 39vw; }
+    }
+    .modal-bg {
+      display: none; position: fixed; z-index: 40; left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.7); align-items: center; justify-content: center;
+    }
+    .modal-bg.active { display: flex; }
+    .modal-img-content {
+      background: white; border-radius: 1rem; padding: 1.2rem; text-align: center; max-width: 95vw; max-height: 90vh;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .modal-img {
+      max-width: 65vw; max-height: 60vh; border-radius: 1rem; margin-bottom: 1rem;
+    }
+    .modal-caption { font-size: 1em; margin-bottom: 0.4rem; }
+    .modal-date { color: #888; font-size: .93em; }
+    .close-modal-btn {
+      background: #eb5b5b; color: white; border: none; border-radius: 100px; cursor: pointer;
+      font-size: 1.2em; padding: 3px 15px; position: absolute; top: 16px; right: 32px;
+    }
+    .form-section {
+      background: #fff; border-radius: 1rem; box-shadow: 0 1px 8px #0001; padding: 1.5rem; margin-bottom: 1.4rem;
+    }
+    .form-field { margin-bottom: 1rem; width: 100%; }
+    label { font-weight: bold; }
+    input, textarea {
+      width: 100%; padding: 0.5rem; border-radius: 0.7rem; border: 1px solid #b4dfbe;
+      font-family: 'Nunito', sans-serif; font-size: 1em; margin-top: 0.2rem;
+    }
+    .notes { color: #165d1b; font-size: 1em; }
+    .plantes-list-title {
+      margin-bottom: 0.6rem; color: #277541;
+      font-size: 1.1em; font-weight: 700;
     }
   </style>
 </head>
 <body>
-<header>
-  <h1>🌱 Carnet Plantes</h1>
-  <div class="subtitle">Carnet collaboratif – Suivi & galerie photo</div>
-</header>
-<div id="main">
-  <div id="listeView" style="display:block"></div>
-  <div id="ficheView" style="display:none"></div>
-</div>
-<button class="add-btn" id="addPlanteBtn" title="Ajouter une plante">+</button>
-<div id="modalLightbox" style="display:none"></div>
-<script src="https://unpkg.com/@supabase/supabase-js"></script>
-<script>
-const supabaseUrl = "https://jooyigpbgyzqldnwldmd.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impvb3lpZ3BiZ3l6cWxkbndsZG1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MzgxODQsImV4cCI6MjA2ODAxNDE4NH0.OAGlTtJ9k0IzzET95PODjrFzFR-q6Zhv71IvJeXetQQ";
-const bucketName = "plantes-photos";
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-let plantes = [];
-let photosAll = {}; // {plante_id: [photos]}
-let currentPlante = null;
-let recherche = "";
-let sortType = "arrosage";
-let editPlanteId = null;
-
-// ------------------- UTILS -------------------
-function formatDate(d) {
-  if (!d) return "";
-  const date = new Date(d);
-  if (isNaN(date)) return "";
-  return date.toLocaleDateString();
-}
-function daysSince(dateString) {
-  if (!dateString) return null;
-  const d = new Date(dateString);
-  const now = new Date();
-  const diff = Math.floor((now - d) / (1000*60*60*24));
-  return diff;
-}
-function escapeHtml(str) {
-  return (str || "").replace(/[&<>"']/g, c => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[c]));
-}
-
-// ------------------- AFFICHAGE PRINCIPAL -------------------
-async function refreshAll() {
-  await loadPlantes();
-  await loadAllPhotos();
-  renderListe();
-}
-async function loadPlantes() {
-  let { data, error } = await supabase.from("plantes").select("*").order("id",{ascending:false});
-  plantes = data || [];
-}
-async function loadAllPhotos() {
-  let { data, error } = await supabase.from("photos").select("*");
-  photosAll = {};
-  (data||[]).forEach(photo => {
-    if (!photosAll[photo.plante_id]) photosAll[photo.plante_id] = [];
-    photosAll[photo.plante_id].push(photo);
-  });
-}
-function renderListe() {
-  document.getElementById('ficheView').style.display = "none";
-  const cont = document.getElementById('listeView');
-  cont.style.display = "block";
-  let html = `
-  <div class="search-row">
-    <input class="search-input" id="searchInput" placeholder="Rechercher une plante..." value="${recherche}" oninput="searchChange(event)">
-    <select class="select-sort" id="sortSelect" onchange="sortChange(event)">
-      <option value="arrosage"${sortType=="arrosage"?" selected":""}>À arroser bientôt</option>
-      <option value="nom"${sortType=="nom"?" selected":""}>Nom (A-Z)</option>
-      <option value="ajout"${sortType=="ajout"?" selected":""}>Date d’ajout</option>
-    </select>
+  <header>
+    <h1>🌱 Carnet Plantes</h1>
+    <div style="font-weight:400;margin-top:.5em;font-size:1.05em;">Ajoutez vos plantes, photos, arrosages, rempotages, notes…</div>
+  </header>
+  <div class="container" id="app">
+    <!-- Ici se génère toute l'app -->
   </div>
-  <div class="grid-plantes">`;
 
-  // Filtres et tri
-  let toShow = plantes.filter(p => p.nom?.toLowerCase().includes(recherche.trim().toLowerCase()));
-  if (sortType=="nom") toShow.sort((a,b)=>a.nom.localeCompare(b.nom));
-  else if (sortType=="ajout") toShow.sort((a,b)=>(b.id-a.id));
-  else if (sortType=="arrosage") toShow.sort((a,b)=>{
-    const dA = a.date_arrosage||"1900-01-01";
-    const dB = b.date_arrosage||"1900-01-01";
-    return (daysSince(dB)??9999)-(daysSince(dA)??9999);
-  });
+  <!-- Modal photo agrandie -->
+  <div class="modal-bg" id="modalBg" onclick="closeModal()">
+    <div class="modal-img-content" onclick="event.stopPropagation();">
+      <button class="close-modal-btn" onclick="closeModal()">&times;</button>
+      <img id="modalImg" class="modal-img" src="" alt="Photo plante">
+      <div class="modal-caption" id="modalCaption"></div>
+      <div class="modal-date" id="modalDate"></div>
+    </div>
+  </div>
 
-  if (!toShow.length) html += `<div class="no-plantes">Aucune plante enregistrée.</div>`;
-  else toShow.forEach(pl => {
-    const phs = (photosAll[pl.id]||[]);
-    html += `<div class="plante-card" onclick="openFiche(${pl.id})">
-      ${
-        phs.length
-        ? `<img src="${escapeHtml(phs[0].url)}" alt="" class="plante-mini">`
-        : `<div class="no-photo">🌱</div>`
-      }
-      <div class="plante-nom">${escapeHtml(pl.nom||"")}</div>
-      <div class="plante-info">
-        ${pl.date_arrosage ? `Arrosée il y a ${daysSince(pl.date_arrosage)}j` : 'Jamais arrosée'}
-        ${daysSince(pl.date_arrosage)===0 ? '<span class="badge-arrosage">À arroser aujourd’hui</span>' : ""}
-      </div>
-      <div class="plante-info">
-        Rempotage : ${pl.date_rempotage ? formatDate(pl.date_rempotage) : "–"}
-      </div>
-    </div>`;
-  });
+  <script src="https://unpkg.com/@supabase/supabase-js"></script>
+  <script>
+    // ---- CONFIGURATION ----
+    const SUPABASE_URL = 'https://YOUR_SUPABASE_PROJECT.supabase.co'; // <-- remplace par ton URL
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // <-- remplace par ta clé
+    const BUCKET = 'plantes-photos';
 
-  html += "</div>";
-  cont.innerHTML = html;
-}
-window.searchChange = function(e) {
-  recherche = e.target.value;
-  renderListe();
-}
-window.sortChange = function(e) {
-  sortType = e.target.value;
-  renderListe();
-}
+    // Remplace ces valeurs ↑ (garde-les confidentielles côté vrai projet, ici c’est pour Github Pages only)
 
-// ------------------ FICHE & GALERIE -----------------
-window.openFiche = async function(id) {
-  currentPlante = plantes.find(p=>p.id===id);
-  if (!currentPlante) return;
-  document.getElementById('listeView').style.display = "none";
-  const phs = photosAll[id]||[];
-  let html = `<div class="fiche-bg">
-    <button class="fiche-btn" onclick="backListe()">← Retour</button>
-    <div class="fiche-title">${escapeHtml(currentPlante.nom)}</div>
-    ${
-      phs.length
-      ? `<img src="${escapeHtml(phs[0].url)}" class="fiche-mini">`
-      : `<div class="no-photo" style="margin:0 auto 13px auto">🌱</div>`
+    // ---- INIT ----
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ---- RENDER APP ----
+    let plantes = [];
+    let photos = [];
+    let currentPlanteId = null;
+
+    document.addEventListener('DOMContentLoaded', initApp);
+
+    async function initApp() {
+      await fetchPlantes();
+      renderPlantesList();
     }
-    <div class="fiche-info">
-      Arrosage : ${currentPlante.date_arrosage ? formatDate(currentPlante.date_arrosage) : "–"}<br>
-      Rempotage : ${currentPlante.date_rempotage ? formatDate(currentPlante.date_rempotage) : "–"}
-    </div>
-    <div class="fiche-notes">${escapeHtml(currentPlante.notes||"")}</div>
-    <div class="fiche-actions">
-      <button class="delete-btn" onclick="deletePlante(${id})">🗑 Supprimer</button>
-    </div>
-    <div class="gallery-title">Galerie photos (${phs.length})</div>
-    <form id="photoUploadForm" style="text-align:center; margin-bottom:12px;">
-      <input type="file" id="photoInput" accept="image/*" required>
-      <input type="text" id="descInput" placeholder="Description (facultatif)" style="width:80%;max-width:250px;display:inline-block;">
-      <button class="fiche-btn" type="submit">Ajouter une photo</button>
-    </form>
-    <div class="gallery-counter">${phs.length ? phs.length+" photo(s)" : "Aucune photo"}</div>
-    <div class="gallery">`;
-  phs.forEach(photo=>{
-    html += `<div class="gallery-item">
-      <img src="${escapeHtml(photo.url)}" alt="" onclick="openModal('${escapeHtml(photo.url)}','${escapeHtml(photo.description||"")}', '${escapeHtml(photo.date_ajout||"")}')">
-      <div class="photo-desc">${escapeHtml(photo.description||"")}</div>
-      <div class="photo-date">${photo.date_ajout ? formatDate(photo.date_ajout) : ""}</div>
-      <button class="del-photo-btn" onclick="deletePhoto(${photo.id},${id});event.stopPropagation()">×</button>
-    </div>`;
-  });
-  html += `</div></div>`;
-  document.getElementById('ficheView').innerHTML = html;
-  document.getElementById('ficheView').style.display = "block";
 
-  // Upload handler
-  document.getElementById('photoUploadForm').onsubmit = async function(ev){
-    ev.preventDefault();
-    const file = document.getElementById('photoInput').files[0];
-    const description = document.getElementById('descInput').value.trim();
-    if(!file) return;
-    const filePath = `${id}/${Date.now()}_${file.name.replace(/[^a-z0-9_.-]/gi, '_')}`;
-    let { error } = await supabase.storage.from(bucketName).upload(filePath, file, { upsert:false });
-    if(error){ alert("Erreur upload: "+error.message); return; }
-    const { data } = supabase.storage.from(bucketName).getPublicUrl(filePath);
-    await supabase.from("photos").insert({
-      plante_id: id, url: data.publicUrl, storage_key: filePath,
-      description
-    });
-    await loadAllPhotos(); openFiche(id);
-  }
-}
+    // ---- API ----
+    async function fetchPlantes() {
+      let { data, error } = await supabase.from('plantes').select('*').order('date_ajout', {ascending: false});
+      plantes = data || [];
+    }
+    async function fetchPhotos(plante_id) {
+      let { data, error } = await supabase.from('photos').select('*').eq('plante_id', plante_id).order('date_ajout', {ascending: false});
+      photos = data || [];
+    }
+    async function addPlante(obj) {
+      let { data, error } = await supabase.from('plantes').insert([obj]);
+      return data ? data[0] : null;
+    }
+    async function deletePlante(id) {
+      await supabase.from('plantes').delete().eq('id', id);
+    }
+    async function addPhoto(plante_id, file, caption) {
+      // 1. Upload dans le bucket Supabase
+      const ext = file.name.split('.').pop();
+      const fileName = `${plante_id}_${Date.now()}.${ext}`;
+      let { data, error: errUp } = await supabase.storage.from(BUCKET).upload(fileName, file);
+      if (errUp) return alert("Erreur upload photo");
+      // 2. Stocker dans la table photos (url, caption, date)
+      let url = supabase.storage.from(BUCKET).getPublicUrl(fileName).publicUrl;
+      let { data: res, error: errInsert } = await supabase.from('photos').insert([{ plante_id, url, caption, date_ajout: new Date() }]);
+      if (errInsert) return alert("Erreur DB photo");
+      return res ? res[0] : null;
+    }
+    async function deletePhoto(photoId, url) {
+      // 1. Supprime DB
+      await supabase.from('photos').delete().eq('id', photoId);
+      // 2. Supprime storage
+      let path = url.split('/').slice(-1)[0];
+      await supabase.storage.from(BUCKET).remove([path]);
+    }
 
-window.backListe = function(){
-  document.getElementById('ficheView').style.display="none";
-  renderListe();
-}
+    // ---- UI RENDER ----
+    function renderPlantesList() {
+      currentPlanteId = null;
+      let html = `
+        <div class="form-section">
+          <div class="plantes-list-title">Ajouter une plante</div>
+          <form onsubmit="return handleAddPlante(event)">
+            <div class="form-field"><label>Nom de la plante</label><input required id="planteNom"></div>
+            <div class="form-field"><label>Photo principale</label><input type="file" id="plantePhoto"></div>
+            <div class="form-field"><label>Date dernier arrosage</label><input type="date" id="dateArrosage"></div>
+            <div class="form-field"><label>Date dernier rempotage</label><input type="date" id="dateRempotage"></div>
+            <div class="form-field"><label>Notes</label><textarea id="planteNotes"></textarea></div>
+            <button class="btn-add" type="submit">Ajouter la plante</button>
+          </form>
+        </div>
+        <div class="plantes-list-title">Mes plantes (${plantes.length})</div>
+        ${plantes.length === 0 ? "<p>Aucune plante enregistrée.</p>" : ""}
+        ${plantes.map(plante => `
+          <div class="plant-card" onclick="handleShowPlante(${plante.id})">
+            <img class="plant-photo-thumb" src="${plante.photo_url || 'https://cdn-icons-png.flaticon.com/512/2909/2909765.png'}" alt="">
+            <div class="plant-main">
+              <div style="font-weight:700;font-size:1.18em">${plante.nom}</div>
+              <div style="color:#34814e;font-size:0.98em">
+                💧 ${plante.date_arrosage ? 'Arrosée le ' + plante.date_arrosage : 'Pas encore arrosée'}<br>
+                🌱 ${plante.date_rempotage ? 'Rempotée le ' + plante.date_rempotage : 'Jamais rempotée'}
+              </div>
+              <div style="font-size:0.95em;color:#444">${plante.notes ? plante.notes : ''}</div>
+            </div>
+          </div>
+        `).join('')}
+      `;
+      document.getElementById('app').innerHTML = html;
+    }
 
-// --------------- SUPPRESSION -----------------
-window.deletePlante = async function(id){
-  if(!confirm("Supprimer cette plante et toutes ses photos ?")) return;
-  await supabase.from("photos").delete().eq("plante_id",id);
-  await supabase.from("plantes").delete().eq("id",id);
-  await refreshAll();
-  backListe();
-}
-window.deletePhoto = async function(photo_id, plante_id){
-  if(!confirm("Supprimer cette photo ?")) return;
-  await supabase.from("photos").delete().eq("id",photo_id);
-  await loadAllPhotos();
-  openFiche(plante_id);
-}
+    async function handleAddPlante(e) {
+      e.preventDefault();
+      let nom = document.getElementById('planteNom').value.trim();
+      let photoInput = document.getElementById('plantePhoto');
+      let date_arrosage = document.getElementById('dateArrosage').value;
+      let date_rempotage = document.getElementById('dateRempotage').value;
+      let notes = document.getElementById('planteNotes').value;
+      let obj = { nom, date_arrosage, date_rempotage, notes, date_ajout: new Date() };
+      let photoUrl = '';
+      // upload photo principale
+      if(photoInput.files.length) {
+        let file = photoInput.files[0];
+        const ext = file.name.split('.').pop();
+        const fileName = `main_${nom.replace(/\s/g,'_')}_${Date.now()}.${ext}`;
+        let { data, error } = await supabase.storage.from(BUCKET).upload(fileName, file);
+        if (!error) photoUrl = supabase.storage.from(BUCKET).getPublicUrl(fileName).publicUrl;
+        obj.photo_url = photoUrl;
+      }
+      let newPlante = await addPlante(obj);
+      await fetchPlantes();
+      renderPlantesList();
+    }
 
-// --------------- MODAL LIGHTBOX -----------------
-window.openModal = function(url, desc, date) {
-  let modal = document.getElementById('modalLightbox');
-  modal.innerHTML = `<div class="modal-bg" onclick="closeModal(event)">
-    <img src="${url}" class="modal-img">
-    <div class="modal-desc">${escapeHtml(desc||"")}</div>
-    <div class="modal-date">${date ? "Ajoutée le "+formatDate(date) : ""}</div>
-    <button class="modal-close" onclick="closeModal(event)">Fermer</button>
-  </div>`;
-  modal.style.display = "flex";
-  document.body.style.overflow = "hidden";
-};
-window.closeModal = function(ev){
-  if(ev && ev.target && !ev.target.classList.contains("modal-close") && !ev.target.classList.contains("modal-bg")) return;
-  document.getElementById('modalLightbox').style.display="none";
-  document.body.style.overflow = "auto";
-};
+    async function handleShowPlante(id) {
+      currentPlanteId = id;
+      let plante = plantes.find(p=>p.id === id);
+      await fetchPhotos(id);
+      // Affiche fiche plante + galerie
+      let html = `
+        <button class="btn-back" onclick="initApp()">&larr; Revenir à la liste</button>
+        <div class="form-section">
+          <div style="display:flex;align-items:center;gap:1rem;">
+            <img class="plant-photo-thumb" src="${plante.photo_url || 'https://cdn-icons-png.flaticon.com/512/2909/2909765.png'}" alt="">
+            <div>
+              <div style="font-weight:700;font-size:1.22em">${plante.nom}</div>
+              <div style="color:#277541;font-size:0.99em">
+                💧 Dernier arrosage : <b>${plante.date_arrosage || '-'}</b><br>
+                🌱 Dernier rempotage : <b>${plante.date_rempotage || '-'}</b>
+              </div>
+              <div style="font-size:.97em;color:#444;margin-top:.2em">${plante.notes ? plante.notes : ''}</div>
+              <button class="btn-delete" onclick="handleDeletePlante(${plante.id});event.stopPropagation();">Supprimer</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-section">
+          <div style="font-weight:700;font-size:1.15em;color:#277541;margin-bottom:0.7em;">Galerie photo / vidéo</div>
+          <form onsubmit="return handleAddPhoto(event,${plante.id})" style="margin-bottom:.8em;">
+            <input type="file" required id="newPhotoFile">
+            <input style="margin-top:.3em;" type="text" id="newPhotoCaption" placeholder="Description ou notes (facultatif)">
+            <button class="btn-add" type="submit">Ajouter photo/vidéo</button>
+          </form>
+          <div class="gallery">
+            ${photos.length === 0 ? '<div>Aucune photo enregistrée.</div>' : photos.map(photo=>`
+              <div class="gallery-img-block">
+                <img class="gallery-img" src="${photo.url}" alt="" onclick="showModal('${photo.url}','${photo.caption || ''}','${photo.date_ajout ? (new Date(photo.date_ajout)).toLocaleString('fr-CA') : ''}')">
+                <div class="gallery-date">${photo.date_ajout ? (new Date(photo.date_ajout)).toLocaleDateString('fr-CA') : ''}</div>
+                <div class="gallery-caption">${photo.caption || ''}</div>
+                <button class="gallery-delete-btn" onclick="handleDeletePhoto(${photo.id},'${photo.url}');event.stopPropagation();">&times;</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      document.getElementById('app').innerHTML = html;
+    }
 
-// --------------- AJOUTER UNE PLANTE ---------------
-document.getElementById('addPlanteBtn').onclick = function(){
-  let cont = document.getElementById('ficheView');
-  cont.innerHTML = `<div class="fiche-bg">
-    <button class="fiche-btn" onclick="backListe()">← Annuler</button>
-    <div class="fiche-title">Ajouter une plante</div>
-    <form id="formAjoutPlante">
-      <label>Nom de la plante
-        <input type="text" id="nomAjout" required maxlength="80" placeholder="ex : Monstera, Ficus, etc.">
-      </label>
-      <label>Notes, besoins, évolution
-        <textarea id="notesAjout" maxlength="400" placeholder="Observations, conseils, lumière, etc."></textarea>
-      </label>
-      <label>Date d'arrosage
-        <input type="date" id="arrosageAjout">
-      </label>
-      <label>Date de rempotage
-        <input type="date" id="rempotageAjout">
-      </label>
-      <button class="fiche-btn" type="submit">Ajouter</button>
-    </form>
-  </div>`;
-  cont.style.display="block";
-  document.getElementById('listeView').style.display="none";
-  document.getElementById('formAjoutPlante').onsubmit = async function(ev){
-    ev.preventDefault();
-    let nom = document.getElementById('nomAjout').value.trim();
-    if(!nom){alert("Nom obligatoire");return;}
-    let notes = document.getElementById('notesAjout').value.trim();
-    let date_arrosage = document.getElementById('arrosageAjout').value;
-    let date_rempotage = document.getElementById('rempotageAjout').value;
-    let { error } = await supabase.from("plantes").insert({
-      nom, notes, date_arrosage, date_rempotage
-    });
-    if(error){alert("Erreur ajout: "+error.message);return;}
-    await refreshAll();
-    backListe();
-  }
-}
+    async function handleAddPhoto(e,plante_id) {
+      e.preventDefault();
+      let fileInput = document.getElementById('newPhotoFile');
+      let caption = document.getElementById('newPhotoCaption').value;
+      if(!fileInput.files.length) return false;
+      await addPhoto(plante_id, fileInput.files[0], caption);
+      await fetchPhotos(plante_id);
+      handleShowPlante(plante_id);
+      return false;
+    }
+    async function handleDeletePlante(id) {
+      if(!confirm("Supprimer cette plante ?")) return;
+      await deletePlante(id);
+      await fetchPlantes();
+      renderPlantesList();
+    }
+    async function handleDeletePhoto(id,url) {
+      if(!confirm("Supprimer cette photo ?")) return;
+      await deletePhoto(id,url);
+      await fetchPhotos(currentPlanteId);
+      handleShowPlante(currentPlanteId);
+    }
 
-// --------------- LANCEMENT ---------------
-refreshAll();
+    // ---- MODAL GESTION ----
+    function showModal(url,caption,date) {
+      document.getElementById('modalBg').classList.add('active');
+      document.getElementById('modalImg').src = url;
+      document.getElementById('modalCaption').textContent = caption;
+      document.getElementById('modalDate').textContent = date ? `Ajoutée le ${date}` : '';
+    }
+    function closeModal() {
+      document.getElementById('modalBg').classList.remove('active');
+      document.getElementById('modalImg').src = '';
+      document.getElementById('modalCaption').textContent = '';
+      document.getElementById('modalDate').textContent = '';
+    }
 
-</script>
+    // Pour éviter les conflits de scope
+    window.handleAddPlante = handleAddPlante;
+    window.handleShowPlante = handleShowPlante;
+    window.handleAddPhoto = handleAddPhoto;
+    window.handleDeletePlante = handleDeletePlante;
+    window.handleDeletePhoto = handleDeletePhoto;
+    window.showModal = showModal;
+    window.closeModal = closeModal;
+  </script>
 </body>
 </html>
