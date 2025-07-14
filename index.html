@@ -131,7 +131,7 @@
       font-size: 1.15em;
     }
     .select-bar .btn {margin:0;}
-    /* Galerie photo styles */
+    /* Gallerie photo styles */
     .gallery {
       display: flex;
       flex-wrap: wrap;
@@ -209,336 +209,335 @@
   <div id="fullscreen" style="display:none"></div>
   <script>
     // ---- CONFIG SUPABASE ----
-    const supabaseUrl = "https://jooyigpbgyzqldnwldmd.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impvb3lpZ3BiZ3l6cWxkbndsZG1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MzgxODQsImV4cCI6MjA2ODAxNDE4NH0.OAGlTtJ9k0IzzET95PODjrFzFR-q6Zhv71IvJeXetQQ";
-    const bucketName = "plantes-photos";
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseUrl = "https://jooyigpbgyzqldnwldmd.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impvb3lpZ3BiZ3l6cWxkbndsZG1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MzgxODQsImV4cCI6MjA2ODAxNDE4NH0.OAGlTtJ9k0IzzET95PODjrFzFR-q6Zhv71IvJeXetQQ";
+const bucketName = "plantes-photos";
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    let plantes = [];
-    let editIndex = null;
-    let selectedPlantes = new Set();
-    let currentPlante = null;
-    let currentPhotos = [];
-    let currentPhotoType = [];
-    let loadingGallery = false;
+let plantes = [];
+let editIndex = null;
+let selectedPlantes = new Set();
+let currentPlante = null;
+let currentPhotos = [];
+let loadingGallery = false;
 
-    // ========== AFFICHAGE ==========
-    function formatDate(d) {
-      if (!d) return "";
-      const date = new Date(d);
-      if (isNaN(date)) return "";
-      return date.toLocaleDateString();
-    }
+// ========== AFFICHAGE ==========
+function formatDate(d) {
+  if (!d) return "";
+  const date = new Date(d);
+  if (isNaN(date)) return "";
+  return date.toLocaleDateString();
+}
 
-    // ==== VUE LISTE DE TOUTES LES PLANTES ====
-    function renderListePlantes() {
-      document.getElementById('fichePlanteView').style.display = "none";
-      const cont = document.getElementById('listePlantesView');
-      cont.style.display = "block";
-      let html = `<div class="form-section" id="addFormSection">
-      <h2>Ajouter une plante</h2>
-      <form id="addPlanteForm">
-        <input id="planteNom" placeholder="Nom de la plante" required maxlength="80"><br>
-        <textarea id="planteNotes" placeholder="Notes, évolution, besoins..." maxlength="300"></textarea><br>
-        <label>Date d’arrosage : <input type="date" id="dateArrosage"></label><br>
-        <label>Date rempotage : <input type="date" id="dateRempotage"></label><br>
-        <button type="submit" class="btn">Ajouter</button>
-      </form></div>
-      <div id="selectBar" style="display:${selectedPlantes.size ? 'flex':'none'};margin-bottom:18px"></div>
-      <div id="plantesList"></div>`;
-      cont.innerHTML = html;
-      renderSelectBar();
-      renderPlantes();
-      document.getElementById('addPlanteForm').onsubmit = addPlante;
-    }
+// ==== VUE LISTE DE TOUTES LES PLANTES ====
+function renderListePlantes() {
+  document.getElementById('fichePlanteView').style.display = "none";
+  const cont = document.getElementById('listePlantesView');
+  cont.style.display = "block";
+  let html = `<div class="form-section" id="addFormSection">
+  <h2>Ajouter une plante</h2>
+  <form id="addPlanteForm">
+    <input id="planteNom" placeholder="Nom de la plante" required maxlength="80"><br>
+    <textarea id="planteNotes" placeholder="Notes, évolution, besoins..." maxlength="300"></textarea><br>
+    <label>Date d’arrosage : <input type="date" id="dateArrosage"></label><br>
+    <label>Date rempotage : <input type="date" id="dateRempotage"></label><br>
+    <button type="submit" class="btn">Ajouter</button>
+  </form></div>
+  <div id="selectBar" style="display:${selectedPlantes.size ? 'flex':'none'};margin-bottom:18px"></div>
+  <div id="plantesList"></div>`;
+  cont.innerHTML = html;
+  renderSelectBar();
+  renderPlantes();
+  document.getElementById('addPlanteForm').onsubmit = addPlante;
+}
 
-    function renderSelectBar() {
-      const bar = document.getElementById('selectBar');
-      if (!bar) return;
-      if (selectedPlantes.size === 0) {
-        bar.style.display = "none";
-        bar.innerHTML = "";
-        return;
-      }
-      bar.style.display = "flex";
-      bar.innerHTML = `<span>${selectedPlantes.size} plante(s) sélectionnée(s)</span>
-        <button class="btn" onclick="arroserSelection()">💧 Arroser aujourd’hui</button>
-        <button class="btn delete-btn" onclick="clearSelection()">Annuler la sélection</button>`;
-    }
+function renderSelectBar() {
+  const bar = document.getElementById('selectBar');
+  if (!bar) return;
+  if (selectedPlantes.size === 0) {
+    bar.style.display = "none";
+    bar.innerHTML = "";
+    return;
+  }
+  bar.style.display = "flex";
+  bar.innerHTML = `<span>${selectedPlantes.size} plante(s) sélectionnée(s)</span>
+    <button class="btn" onclick="arroserSelection()">💧 Arroser aujourd’hui</button>
+    <button class="btn delete-btn" onclick="clearSelection()">Annuler la sélection</button>`;
+}
 
-    function renderPlantes() {
-      const list = document.getElementById('plantesList');
-      if (!list) return;
-      list.innerHTML = "";
-      if (plantes.length === 0) {
-        list.innerHTML = "<div style='margin-top:32px;color:#7fc17f;text-align:center'>Aucune plante pour l’instant.<br>Ajoute ta première plante !</div>";
-        return;
-      }
-      plantes.forEach((plante, idx) => {
-        if (editIndex === idx) {
-          list.innerHTML += `
-          <div class="plante-card" style="cursor:auto">
-            <div class="plante-header">
-              <span class="plante-title">📝 Modifier ${plante.nom}</span>
-            </div>
-            <form class="edit-form" onsubmit="return saveEdit(event,${plante.id},${idx})">
-              <label>Nom : <input id="editNom${plante.id}" value="${plante.nom||''}" maxlength="80" required></label><br>
-              <label>Notes :<br><textarea id="editNotes${plante.id}" maxlength="300">${plante.notes||''}</textarea></label><br>
-              <label>Date arrosage : <input type="date" id="editArrosage${plante.id}" value="${plante.date_arrosage ? plante.date_arrosage.split('T')[0] : ''}"></label><br>
-              <label>Date rempotage : <input type="date" id="editRempotage${plante.id}" value="${plante.date_rempotage ? plante.date_rempotage.split('T')[0] : ''}"></label><br>
-              <button class="btn" type="submit">Sauvegarder</button>
-              <button class="btn" type="button" onclick="cancelEdit()">Annuler</button>
-            </form>
-          </div>`;
-        } else {
-          list.innerHTML += `
-          <div class="plante-card" onclick="openFiche(${plante.id})">
-            <input type="checkbox" class="plante-checkbox" id="checkbox${plante.id}" data-idx="${idx}" ${selectedPlantes.has(plante.id) ? 'checked' : ''} onclick="event.stopPropagation();togglePlanteSelect(${plante.id})">
-            <div style="flex:1">
-              <div class="plante-header">
-                <span class="plante-title">${plante.nom ? "🌿 "+plante.nom : "Plante"}</span>
-                <div>
-                  <button class="btn" onclick="event.stopPropagation();editPlante(${idx})">Modifier</button>
-                  <button class="btn delete-btn" onclick="event.stopPropagation();deletePlante(${plante.id})">Supprimer</button>
-                </div>
-              </div>
-              <div class="dates">
-                Ajoutée le : ${formatDate(plante.date_ajout)}
-                ${plante.date_arrosage ? `<br>Dernier arrosage : <b>${formatDate(plante.date_arrosage)}</b>` : ""}
-                ${plante.date_rempotage ? `<br>Dernier rempotage : <b>${formatDate(plante.date_rempotage)}</b>` : ""}
-              </div>
-              <div class="notes">${plante.notes ? plante.notes : ""}</div>
-            </div>
-          </div>
-        `;
-        }
-      });
-      renderSelectBar();
-    }
-
-    // ==== VUE FICHE PLANTE & GALERIE ====
-    async function openFiche(id) {
-      if (editIndex !== null) return; // Ne pas ouvrir fiche si édition en cours
-      currentPlante = plantes.find(p => p.id === id);
-      await loadGalleryPhotos();
-      document.getElementById('listePlantesView').style.display = "none";
-      renderFichePlante();
-      document.getElementById('fichePlanteView').style.display = "block";
-    }
-
-    function renderFichePlante() {
-      const cont = document.getElementById('fichePlanteView');
-      if (!currentPlante) { cont.innerHTML = "Erreur"; return; }
-      let html = `<button class="btn" onclick="goBackListe()">⬅ Revenir à la liste</button><br><br>
-        <div class="form-section">
-          <h2>🌿 ${currentPlante.nom}</h2>
-          <div class="dates">
-            Ajoutée le : ${formatDate(currentPlante.date_ajout)}
-            ${currentPlante.date_arrosage ? `<br>Dernier arrosage : <b>${formatDate(currentPlante.date_arrosage)}</b>` : ""}
-            ${currentPlante.date_rempotage ? `<br>Dernier rempotage : <b>${formatDate(currentPlante.date_rempotage)}</b>` : ""}
-          </div>
-          <div class="notes">${currentPlante.notes ? currentPlante.notes : ""}</div>
+function renderPlantes() {
+  const list = document.getElementById('plantesList');
+  if (!list) return;
+  list.innerHTML = "";
+  if (plantes.length === 0) {
+    list.innerHTML = "<div style='margin-top:32px;color:#7fc17f;text-align:center'>Aucune plante pour l’instant.<br>Ajoute ta première plante !</div>";
+    return;
+  }
+  plantes.forEach((plante, idx) => {
+    if (editIndex === idx) {
+      list.innerHTML += `
+      <div class="plante-card" style="cursor:auto">
+        <div class="plante-header">
+          <span class="plante-title">📝 Modifier ${plante.nom}</span>
         </div>
-        <div class="form-section">
-          <h2>Galerie photo / vidéo</h2>
-          <div class="gallery-counter">${currentPhotos.length} fichier(s)</div>
-          <form onsubmit="return false;">
-            <input type="file" id="fileInput" accept="image/*,video/*" multiple style="margin-bottom:7px">
-            <button class="btn" type="button" onclick="uploadFiles()">Ajouter photo/vidéo</button>
-          </form>
-          <div style="color:#be3030;font-size:0.99em;margin:5px 0" id="uploadError"></div>
-          <div class="gallery" id="galleryCont">`;
-      if (loadingGallery) {
-        html += `<div style="color:#6dbd7a">Chargement...</div>`;
-      } else if (currentPhotos.length === 0) {
-        html += `<div style="color:#97a292">Aucune photo/vidéo enregistrée pour cette plante.</div>`;
-      } else {
-        currentPhotos.forEach(photo => {
-          let ext = photo.url.split('.').pop().toLowerCase();
-          let isVideo = ext === "mp4" || ext === "webm" || ext === "mov" || ext === "avi";
-          html += `<div class="gallery-item">
-            ${isVideo ? `<video src="${photo.url}" controls onclick="showFullscreen(event,'${photo.url}',true)"></video>` 
-              : `<img src="${photo.url}" onclick="showFullscreen(event,'${photo.url}',false)">`}
-            <button class="del-btn" onclick="deletePhoto('${photo.id}','${photo.storage_key}');event.stopPropagation()">×</button>
-          </div>`;
-        });
-      }
-      html += `</div></div>`;
-      cont.innerHTML = html;
+        <form class="edit-form" onsubmit="return saveEdit(event,${plante.id},${idx})">
+          <label>Nom : <input id="editNom${plante.id}" value="${plante.nom||''}" maxlength="80" required></label><br>
+          <label>Notes :<br><textarea id="editNotes${plante.id}" maxlength="300">${plante.notes||''}</textarea></label><br>
+          <label>Date arrosage : <input type="date" id="editArrosage${plante.id}" value="${plante.date_arrosage ? plante.date_arrosage.split('T')[0] : ''}"></label><br>
+          <label>Date rempotage : <input type="date" id="editRempotage${plante.id}" value="${plante.date_rempotage ? plante.date_rempotage.split('T')[0] : ''}"></label><br>
+          <button class="btn" type="submit">Sauvegarder</button>
+          <button class="btn" type="button" onclick="cancelEdit()">Annuler</button>
+        </form>
+      </div>`;
+    } else {
+      list.innerHTML += `
+      <div class="plante-card" onclick="openFiche(${plante.id})">
+        <input type="checkbox" class="plante-checkbox" id="checkbox${plante.id}" data-idx="${idx}" ${selectedPlantes.has(plante.id) ? 'checked' : ''} onclick="event.stopPropagation();togglePlanteSelect(${plante.id})">
+        <div style="flex:1">
+          <div class="plante-header">
+            <span class="plante-title">${plante.nom ? "🌿 "+plante.nom : "Plante"}</span>
+            <div>
+              <button class="btn" onclick="event.stopPropagation();editPlante(${idx})">Modifier</button>
+              <button class="btn delete-btn" onclick="event.stopPropagation();deletePlante(${plante.id})">Supprimer</button>
+            </div>
+          </div>
+          <div class="dates">
+            Ajoutée le : ${formatDate(plante.date_ajout)}
+            ${plante.date_arrosage ? `<br>Dernier arrosage : <b>${formatDate(plante.date_arrosage)}</b>` : ""}
+            ${plante.date_rempotage ? `<br>Dernier rempotage : <b>${formatDate(plante.date_rempotage)}</b>` : ""}
+          </div>
+          <div class="notes">${plante.notes ? plante.notes : ""}</div>
+        </div>
+      </div>
+    `;
     }
+  });
+  renderSelectBar();
+}
 
-    function goBackListe() {
-      document.getElementById('fichePlanteView').style.display = "none";
-      currentPlante = null;
-      renderListePlantes();
-    }
+// ==== VUE FICHE PLANTE & GALERIE ====
+async function openFiche(id) {
+  if (editIndex !== null) return;
+  currentPlante = plantes.find(p => p.id === id);
+  await loadGalleryPhotos();
+  document.getElementById('listePlantesView').style.display = "none";
+  renderFichePlante();
+  document.getElementById('fichePlanteView').style.display = "block";
+}
 
-    // ========= GALERIE (upload, afficher, suppression) =============
+function renderFichePlante() {
+  const cont = document.getElementById('fichePlanteView');
+  if (!currentPlante) { cont.innerHTML = "Erreur"; return; }
+  let html = `<button class="btn" onclick="goBackListe()">⬅ Revenir à la liste</button><br><br>
+    <div class="form-section">
+      <h2>🌿 ${currentPlante.nom}</h2>
+      <div class="dates">
+        Ajoutée le : ${formatDate(currentPlante.date_ajout)}
+        ${currentPlante.date_arrosage ? `<br>Dernier arrosage : <b>${formatDate(currentPlante.date_arrosage)}</b>` : ""}
+        ${currentPlante.date_rempotage ? `<br>Dernier rempotage : <b>${formatDate(currentPlante.date_rempotage)}</b>` : ""}
+      </div>
+      <div class="notes">${currentPlante.notes ? currentPlante.notes : ""}</div>
+    </div>
+    <div class="form-section">
+      <h2>Galerie photo / vidéo</h2>
+      <div class="gallery-counter">${currentPhotos.length} fichier(s)</div>
+      <form onsubmit="return false;">
+        <input type="file" id="fileInput" accept="image/*,video/*" multiple style="margin-bottom:7px">
+        <button class="btn" type="button" onclick="uploadFiles()">Ajouter photo/vidéo</button>
+      </form>
+      <div style="color:#be3030;font-size:0.99em;margin:5px 0" id="uploadError"></div>
+      <div class="gallery" id="galleryCont">`;
+  if (loadingGallery) {
+    html += `<div style="color:#6dbd7a">Chargement...</div>`;
+  } else if (currentPhotos.length === 0) {
+    html += `<div style="color:#97a292">Aucune photo/vidéo enregistrée pour cette plante.</div>`;
+  } else {
+    currentPhotos.forEach(photo => {
+      let ext = photo.url.split('.').pop().toLowerCase();
+      let isVideo = ext === "mp4" || ext === "webm" || ext === "mov" || ext === "avi";
+      html += `<div class="gallery-item">
+        ${isVideo ? `<video src="${photo.url}" controls onclick="showFullscreen(event,'${photo.url}',true)"></video>` 
+          : `<img src="${photo.url}" onclick="showFullscreen(event,'${photo.url}',false)">`}
+        <button class="del-btn" onclick="deletePhoto('${photo.id}','${photo.storage_key}');event.stopPropagation()">×</button>
+      </div>`;
+    });
+  }
+  html += `</div></div>`;
+  cont.innerHTML = html;
+}
 
-    async function loadGalleryPhotos() {
-      loadingGallery = true;
-      renderFichePlante();
-      let { data, error } = await supabase
-        .from('photos')
-        .select('*')
-        .eq('plante_id', currentPlante.id)
-        .order('date_ajout', { ascending: false });
-      currentPhotos = data || [];
-      loadingGallery = false;
-    }
+function goBackListe() {
+  document.getElementById('fichePlanteView').style.display = "none";
+  currentPlante = null;
+  renderListePlantes();
+}
 
-    window.uploadFiles = async function() {
-      let files = document.getElementById('fileInput').files;
-      let errorDiv = document.getElementById('uploadError');
-      errorDiv.textContent = "";
-      if (!files.length) { errorDiv.textContent = "Aucun fichier sélectionné."; return; }
-      const maxSize = 15 * 1024 * 1024; // 15 Mo
-      for (let i = 0; i < files.length; i++) {
-        let file = files[i];
-        if (file.size > maxSize) {
-          errorDiv.textContent = `Le fichier "${file.name}" est trop lourd (max 15 Mo).`;
-          return;
-        }
-        let ext = file.name.split('.').pop().toLowerCase();
-        let path = `${currentPlante.id}/${Date.now()}_${file.name}`;
-        let { data, error } = await supabase.storage.from(bucketName).upload(path, file, { upsert: false });
-        if (error) { errorDiv.textContent = error.message; return; }
-        let publicURL = supabase.storage.from(bucketName).getPublicUrl(path).data.publicUrl;
-        let { error: err2 } = await supabase.from('photos').insert([{
-          plante_id: currentPlante.id,
-          url: publicURL,
-          storage_key: path,
-          date_ajout: new Date()
-        }]);
-        if (err2) { errorDiv.textContent = err2.message; return; }
-      }
-      document.getElementById('fileInput').value = "";
-      await loadGalleryPhotos();
-      renderFichePlante();
-    }
+// ========= GALERIE (upload, afficher, suppression) =============
 
-    window.deletePhoto = async function(photo_id, storage_key) {
-      if (!confirm("Supprimer cette photo/vidéo ?")) return;
-      await supabase.storage.from(bucketName).remove([storage_key]);
-      await supabase.from('photos').delete().eq('id', photo_id);
-      await loadGalleryPhotos();
-      renderFichePlante();
-    }
+async function loadGalleryPhotos() {
+  loadingGallery = true;
+  renderFichePlante();
+  let { data, error } = await supabase
+    .from('photos')
+    .select('*')
+    .eq('plante_id', currentPlante.id)
+    .order('date_ajout', { ascending: false });
+  currentPhotos = data || [];
+  loadingGallery = false;
+}
 
-    window.showFullscreen = function(event, url, isVideo) {
-      event.stopPropagation();
-      let fs = document.getElementById('fullscreen');
-      fs.innerHTML = isVideo
-        ? `<video src="${url}" controls autoplay style="background:#000"></video>`
-        : `<img src="${url}">`;
-      fs.innerHTML += `<button class="btn" onclick="closeFullscreen()">Fermer</button>`;
-      fs.style.display = "flex";
-      fs.onclick = closeFullscreen;
+window.uploadFiles = async function() {
+  let files = document.getElementById('fileInput').files;
+  let errorDiv = document.getElementById('uploadError');
+  errorDiv.textContent = "";
+  if (!files.length) { errorDiv.textContent = "Aucun fichier sélectionné."; return; }
+  const maxSize = 15 * 1024 * 1024; // 15 Mo
+  for (let i = 0; i < files.length; i++) {
+    let file = files[i];
+    if (file.size > maxSize) {
+      errorDiv.textContent = `Le fichier "${file.name}" est trop lourd (max 15 Mo).`;
+      return;
     }
-    window.closeFullscreen = function() {
-      let fs = document.getElementById('fullscreen');
-      fs.style.display = "none";
-      fs.innerHTML = "";
-    }
+    let ext = file.name.split('.').pop().toLowerCase();
+    let path = `${currentPlante.id}/${Date.now()}_${file.name}`;
+    let { data, error } = await supabase.storage.from(bucketName).upload(path, file, { upsert: false });
+    if (error) { errorDiv.textContent = error.message; return; }
+    let publicURL = supabase.storage.from(bucketName).getPublicUrl(path).data.publicUrl;
+    let { error: err2 } = await supabase.from('photos').insert([{
+      plante_id: currentPlante.id,
+      url: publicURL,
+      storage_key: path,
+      date_ajout: new Date()
+    }]);
+    if (err2) { errorDiv.textContent = err2.message; return; }
+  }
+  document.getElementById('fileInput').value = "";
+  await loadGalleryPhotos();
+  renderFichePlante();
+}
 
-    // ========== LOGIQUE PLANTES (ajout/édition/supp/sélection/arrosage) ============
+window.deletePhoto = async function(photo_id, storage_key) {
+  if (!confirm("Supprimer cette photo/vidéo ?")) return;
+  await supabase.storage.from(bucketName).remove([storage_key]);
+  await supabase.from('photos').delete().eq('id', photo_id);
+  await loadGalleryPhotos();
+  renderFichePlante();
+}
 
-    async function loadData() {
-      let { data: p, error } = await supabase
-        .from('plantes')
-        .select('*')
-        .order('id', { ascending: false });
-      if (error) {
-        document.getElementById('listePlantesView').innerHTML = `<div style="color:red">Erreur : ${error.message}</div>`;
-        return;
-      }
-      plantes = p || [];
-      renderListePlantes();
-    }
+window.showFullscreen = function(event, url, isVideo) {
+  event.stopPropagation();
+  let fs = document.getElementById('fullscreen');
+  fs.innerHTML = isVideo
+    ? `<video src="${url}" controls autoplay style="background:#000"></video>`
+    : `<img src="${url}">`;
+  fs.innerHTML += `<button class="btn" onclick="closeFullscreen()">Fermer</button>`;
+  fs.style.display = "flex";
+  fs.onclick = closeFullscreen;
+}
+window.closeFullscreen = function() {
+  let fs = document.getElementById('fullscreen');
+  fs.style.display = "none";
+  fs.innerHTML = "";
+}
 
-    async function addPlante(e) {
-      e.preventDefault();
-      const nom = document.getElementById('planteNom').value;
-      const notes = document.getElementById('planteNotes').value;
-      const date_ajout = new Date();
-      const date_arrosage = document.getElementById('dateArrosage').value ? new Date(document.getElementById('dateArrosage').value) : null;
-      const date_rempotage = document.getElementById('dateRempotage').value ? new Date(document.getElementById('dateRempotage').value) : null;
-      const { error } = await supabase
-        .from('plantes')
-        .insert([{ nom, notes, date_ajout, date_arrosage, date_rempotage }]);
-      if (error) { alert("Erreur ajout plante : " + error.message); return; }
-      await loadData();
-      document.getElementById('addPlanteForm').reset();
-    }
+// ========== LOGIQUE PLANTES (ajout/édition/supp/sélection/arrosage) ============
 
-    async function deletePlante(id) {
-      if (!confirm("Supprimer cette plante ? Cette action est définitive.")) return;
-      await supabase.from('plantes').delete().eq('id', id);
-      await supabase.from('photos').delete().eq('plante_id', id);
-      await loadData();
-    }
+async function loadData() {
+  let { data: p, error } = await supabase
+    .from('plantes')
+    .select('*')
+    .order('id', { ascending: false });
+  if (error) {
+    document.getElementById('listePlantesView').innerHTML = `<div style="color:red">Erreur : ${error.message}</div>`;
+    return;
+  }
+  plantes = p || [];
+  renderListePlantes();
+}
 
-    window.editPlante = function(idx) {
-      editIndex = idx;
-      renderPlantes();
-      setTimeout(()=>{window.scrollTo({top:0,left:0,behavior:'smooth'});},200);
-    }
-    window.cancelEdit = function() {
-      editIndex = null;
-      renderPlantes();
-    }
-    window.saveEdit = async function(e, id, idx) {
-      e.preventDefault();
-      const nom = document.getElementById('editNom'+id).value;
-      const notes = document.getElementById('editNotes'+id).value;
-      const date_arrosage = document.getElementById('editArrosage'+id).value;
-      const date_rempotage = document.getElementById('editRempotage'+id).value;
-      const { error } = await supabase
-        .from('plantes')
-        .update({
-          nom, notes,
-          date_arrosage: date_arrosage||null,
-          date_rempotage: date_rempotage||null
-        }).eq('id', id);
-      if (error) { alert("Erreur modif : " + error.message); return; }
-      editIndex = null;
-      await loadData();
-    }
+async function addPlante(e) {
+  e.preventDefault();
+  const nom = document.getElementById('planteNom').value;
+  const notes = document.getElementById('planteNotes').value;
+  const date_ajout = new Date();
+  const date_arrosage = document.getElementById('dateArrosage').value ? new Date(document.getElementById('dateArrosage').value) : null;
+  const date_rempotage = document.getElementById('dateRempotage').value ? new Date(document.getElementById('dateRempotage').value) : null;
+  const { error } = await supabase
+    .from('plantes')
+    .insert([{ nom, notes, date_ajout, date_arrosage, date_rempotage }]);
+  if (error) { alert("Erreur ajout plante : " + error.message); return; }
+  await loadData();
+  document.getElementById('addPlanteForm').reset();
+}
 
-    window.togglePlanteSelect = function(id) {
-      if (selectedPlantes.has(id)) selectedPlantes.delete(id);
-      else selectedPlantes.add(id);
-      renderPlantes();
-    }
-    window.clearSelection = function() {
-      selectedPlantes.clear();
-      renderPlantes();
-    }
-    window.arroserSelection = async function() {
-      if (selectedPlantes.size === 0) return;
-      if (!confirm("Mettre à jour la date d’arrosage de toutes les plantes sélectionnées à aujourd’hui ?")) return;
-      const ids = Array.from(selectedPlantes);
-      const today = new Date().toISOString();
-      const { error } = await supabase
-        .from('plantes')
-        .update({ date_arrosage: today })
-        .in('id', ids);
-      if (error) { alert("Erreur lors de l’arrosage groupé : " + error.message); return; }
-      selectedPlantes.clear();
-      await loadData();
-    }
+async function deletePlante(id) {
+  if (!confirm("Supprimer cette plante ? Cette action est définitive.")) return;
+  await supabase.from('plantes').delete().eq('id', id);
+  await supabase.from('photos').delete().eq('plante_id', id);
+  await loadData();
+}
 
-    // ---- SYNCHRO TEMPS RÉEL
-    supabase.channel('realtime-plantes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'plantes' }, payload => loadData())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'photos' }, payload => {
-        // Si fiche plante affichée, recharge sa galerie instantanément
-        if (currentPlante) loadGalleryPhotos().then(renderFichePlante);
-      })
-      .subscribe();
+window.editPlante = function(idx) {
+  editIndex = idx;
+  renderPlantes();
+  setTimeout(()=>{window.scrollTo({top:0,left:0,behavior:'smooth'});},200);
+}
+window.cancelEdit = function() {
+  editIndex = null;
+  renderPlantes();
+}
+window.saveEdit = async function(e, id, idx) {
+  e.preventDefault();
+  const nom = document.getElementById('editNom'+id).value;
+  const notes = document.getElementById('editNotes'+id).value;
+  const date_arrosage = document.getElementById('editArrosage'+id).value;
+  const date_rempotage = document.getElementById('editRempotage'+id).value;
+  const { error } = await supabase
+    .from('plantes')
+    .update({
+      nom, notes,
+      date_arrosage: date_arrosage||null,
+      date_rempotage: date_rempotage||null
+    }).eq('id', id);
+  if (error) { alert("Erreur modif : " + error.message); return; }
+  editIndex = null;
+  await loadData();
+}
 
-    // ---- INIT
-    loadData();
+window.togglePlanteSelect = function(id) {
+  if (selectedPlantes.has(id)) selectedPlantes.delete(id);
+  else selectedPlantes.add(id);
+  renderPlantes();
+}
+window.clearSelection = function() {
+  selectedPlantes.clear();
+  renderPlantes();
+}
+window.arroserSelection = async function() {
+  if (selectedPlantes.size === 0) return;
+  if (!confirm("Mettre à jour la date d’arrosage de toutes les plantes sélectionnées à aujourd’hui ?")) return;
+  const ids = Array.from(selectedPlantes);
+  const today = new Date().toISOString();
+  const { error } = await supabase
+    .from('plantes')
+    .update({ date_arrosage: today })
+    .in('id', ids);
+  if (error) { alert("Erreur lors de l’arrosage groupé : " + error.message); return; }
+  selectedPlantes.clear();
+  await loadData();
+}
+
+// ---- SYNCHRO TEMPS RÉEL
+supabase.channel('realtime-plantes')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'plantes' }, payload => loadData())
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'photos' }, payload => {
+    if (currentPlante) loadGalleryPhotos().then(renderFichePlante);
+  })
+  .subscribe();
+
+// ---- INIT
+loadData();
+// (La suite du JavaScript dans le message suivant !)
   </script>
 </body>
 </html>
