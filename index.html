@@ -7,17 +7,36 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 2em; background: #fafcfb; }
     h1 { color: #2c5f2d; }
+    form { background: #e8f5e9; padding: 1em; border-radius: 8px; margin-bottom: 1.5em; }
+    label { display: block; margin-bottom: 0.2em; font-weight: bold;}
+    input, textarea { width: 99%; margin-bottom: 0.8em; border-radius: 5px; border: 1px solid #ddd; padding: 0.4em;}
+    button { background: #5bc374; color: white; padding: 0.7em 2em; border-radius: 7px; border: none; font-size: 1em; cursor: pointer; }
     ul { background: #e8f5e9; padding: 1em; border-radius: 8px; }
     li { margin-bottom: 0.5em; }
   </style>
 </head>
 <body>
   <h1>Carnet Plantes</h1>
+  <form id="ajout-form">
+    <label for="nom">Nom de la plante :</label>
+    <input id="nom" required autocomplete="off">
+
+    <label for="notes">Notes / évolution :</label>
+    <textarea id="notes" rows="2"></textarea>
+
+    <label for="date_arrosage">Date d'arrosage :</label>
+    <input id="date_arrosage" type="date">
+
+    <label for="date_rempotage">Date rempotage :</label>
+    <input id="date_rempotage" type="date">
+
+    <button type="submit">Ajouter la plante</button>
+  </form>
   <ul id="plantes-list">
     <li>Chargement…</li>
   </ul>
   <script>
-    // Remplace par TES clés du projet Supabase
+    // Tes clés Supabase
     const supabaseUrl = 'https://jooyigpbgyzqldnwldmd.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impvb3lpZ3BiZ3l6cWxkbndsZG1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MzgxODQsImV4cCI6MjA2ODAxNDE4NH0.OAGlTtJ9k0IzzET95PODjrFzFR-q6Zhv71IvJeXetQQ';
     const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
@@ -38,9 +57,27 @@
         return;
       }
       data.forEach(plante => {
-        ul.innerHTML += `<li><b>${plante.nom}</b> — Dernier arrosage : ${plante.date_arrosage ? plante.date_arrosage.split('T')[0] : 'N/A'}</li>`;
+        ul.innerHTML += `<li><b>${plante.nom}</b> — Dernier arrosage : ${plante.date_arrosage ? plante.date_arrosage.split('T')[0] : 'N/A'}<br>
+        <i>${plante.notes || ''}</i></li>`;
       });
     }
+
+    // Soumission du formulaire
+    document.getElementById('ajout-form').onsubmit = async function(event) {
+      event.preventDefault();
+      const nom = document.getElementById('nom').value;
+      const notes = document.getElementById('notes').value;
+      const date_arrosage = document.getElementById('date_arrosage').value;
+      const date_rempotage = document.getElementById('date_rempotage').value;
+      const { error } = await _supabase.from('plantes').insert([
+        {
+          nom, notes, date_arrosage: date_arrosage || null, date_rempotage: date_rempotage || null
+        }
+      ]);
+      if (error) alert('Erreur : ' + error.message);
+      document.getElementById('ajout-form').reset();
+      chargerPlantes();
+    };
 
     chargerPlantes();
   </script>
