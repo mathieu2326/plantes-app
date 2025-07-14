@@ -6,58 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    /* ... (tes styles inchangés ici, tu peux garder tout le bloc <style> tel quel) ... */
     body { font-family: 'Montserrat', Arial, sans-serif; margin:0; padding:0; background:#f5faf6; color:#224c30;}
-    header { background:#56ba75; color:#fff; padding:2rem 0 1.2rem 0; text-align:center; border-radius:0 0 2rem 2rem; margin-bottom:1.2rem; box-shadow:0 4px 18px #7ddba643;}
-    .container { max-width:780px; margin:auto; padding:1.2rem 1rem 3rem 1rem;}
-    .search-bar { display:flex; gap:1rem; align-items:center; margin-bottom:1.2rem; flex-wrap:wrap;}
-    .search-bar input { font-size:1.05em; border-radius:0.7em; border:1px solid #bdddb8; padding:0.55em 1em; flex:1; min-width:200px;}
-    .btn-add { background:#48be6b; color:#fff; border:none; border-radius:1.8em; padding:0.65em 1.8em; font-size:1.17em; font-weight:700; margin:0 0.2em; cursor:pointer; transition:background .17s;}
-    .btn-add:hover { background:#2a9247; }
-    .plants-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(285px, 1fr)); gap:1.3rem;}
-    .plant-card { background:#fff; border-radius:1.3rem; box-shadow:0 2px 10px #b3e1c74a; display:flex; gap:1.2em; align-items:center; padding:1.1em 1.1em; position:relative; min-height:95px; cursor:pointer; transition:box-shadow .17s;}
-    .plant-card:hover { box-shadow:0 6px 16px #95dab133;}
-    .plant-thumb { width:64px; height:64px; object-fit:cover; border-radius:1em; background:#ecf9f1; border:1.5px solid #c2eac6; display:block;}
-    .thumb-default { display:flex; align-items:center; justify-content:center; width:64px; height:64px; border-radius:1em; background:#e0f4e6; color:#6ec284; font-size:2em; border:1.5px solid #c2eac6;}
-    .plant-info { flex:1;}
-    .plant-name { font-size:1.17em; font-weight:bold; margin-bottom:0.1em; color:#23533d;}
-    .plant-dates { font-size:0.97em; color:#487656; margin-bottom:0.4em;}
-    .arrosage-today { color:#fff; background:#44bb4c; border-radius:0.8em; font-size:0.95em; padding:2px 13px; margin-left:0.8em; font-weight:600;}
-    .plant-actions { display:flex; gap:7px; margin-top:0.4em;}
-    .btn-edit, .btn-delete { border:none; border-radius:8px; font-size:.97em; font-weight:600; cursor:pointer; padding:7px 12px; box-shadow:0 1px 7px #c5dece38; transition:background .13s;}
-    .btn-edit { background:#e0f7e9; color:#168942;}
-    .btn-edit:hover { background:#b8f2c7;}
-    .btn-delete { background:#f16868; color:#fff;}
-    .btn-delete:hover {background:#be3030;}
-    .arrosage-check { accent-color:#44bb4c; transform:scale(1.18); margin-right:4px; margin-left:0.8em;}
-    .edit-date { border:1px solid #bdddb8; border-radius:0.6em; font-size:1em; padding:2px 7px; margin-left:7px; margin-bottom:1px;}
-    .fiche-bg { background:#f7faf7f7; border-radius:1.1em; box-shadow:0 3px 16px #b2bfa84b; padding:1.6em 1.1em 1.1em 1.1em; max-width:510px; margin:24px auto 0 auto; position:relative;}
-    .fiche-title { font-size:1.38em; font-weight:700; color:#24422b; text-align:center;}
-    .fiche-thumb { width:120px; height:120px; object-fit:cover; border-radius:1.1em; background:#eafaea; box-shadow:0 1px 8px #b2bfa866; display:block; margin:0 auto 13px auto;}
-    .fiche-notes { margin:12px 0 10px 0; color:#34643c; background:#eafaea; border-radius:8px; padding:7px 10px; min-height:28px; font-size:1.01em; text-align:center;}
-    .fiche-actions { display:flex; gap:12px; justify-content:center; margin-bottom:10px; margin-top:8px;}
-    .fiche-btn { background:#7dd8a3; color:#fff; border:none; border-radius:8px; padding:7px 19px; cursor:pointer; font-size:1.08em; font-weight:600; transition:background .17s;}
-    .fiche-btn:hover {background:#47b16c;}
-    .fiche-label {font-size:1em; margin-top:0.9em; color:#1e5832;}
-    .fiche-field { margin-bottom:0.7em;}
-    .gallery-title { margin-top:15px; margin-bottom:4px; font-weight:600; font-size:1.09em; color:#377a49; text-align:center;}
-    .gallery { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-bottom:7px;}
-    .gallery-item { position:relative; display:inline-block;}
-    .gallery img { border-radius:10px; width:78px; height:78px; object-fit:cover; cursor:pointer; border:2px solid #c2e3ca; background:#eafaea;}
-    .del-photo-btn { position:absolute; top:-8px; right:-8px; background:#f16868; color:#fff; font-weight:bold; border:none; width:23px; height:23px; font-size:1.11em; border-radius:50%; cursor:pointer; padding:0; z-index:3;}
-    .photo-desc { font-size:0.97em; color:#437c56; background:#eafaea; border-radius:6px; padding:2px 5px; margin:4px 0 2px 0; text-align:center;}
-    .gallery-counter { margin:4px 0 10px 0; color:#457853; font-size:1.02em; font-weight:500; text-align:center;}
-    .photo-date { font-size:0.88em; color:#7fa88f; margin-bottom:2px; text-align:center;}
-    .modal-bg { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(34,52,30,0.95); display:none; align-items:center; justify-content:center; flex-direction:column; z-index:9999;}
-    .modal-bg.active { display:flex; }
-    .modal-img { max-width:92vw; max-height:83vh; border-radius:16px; box-shadow:0 4px 24px #86a68f; background:#fff; margin-bottom:17px;}
-    .modal-desc, .modal-date { color:#fff; text-align:center; margin-bottom:8px; font-size:1.08em;}
-    .modal-close { background:#fff; color:#285c34; border:none; border-radius:10px; font-size:1.12em; font-weight:700; padding:7px 19px; cursor:pointer; margin-top:11px; box-shadow:0 2px 8px #285c3427; transition:background .13s;}
-    .modal-close:hover {background:#e0f7e9;}
-    .form-section { background:#e8f5e1; border-radius:13px; margin-bottom:2.4em; padding:18px 14px 9px 14px; box-shadow:0 1px 6px #b2bfa8a8; max-width:500px; margin-left:auto;margin-right:auto;}
-    input, textarea, select { width:99%; padding:8px; margin:7px 0 16px 0; border-radius:7px; border:1px solid #bdddb8; font-size:1em; font-family:inherit; background:#fafdfe; box-sizing:border-box;}
-    label {font-size:1.04em;}
-    .no-plantes { color:#87b29a; font-size:1.2em; text-align:center; margin-top:44px; letter-spacing:.5px;}
-    @media (max-width:700px) { .container{padding:0.2rem;} .plants-grid{gap:0.7rem;} .plant-card{gap:0.6em; padding:0.7em 0.7em;} .fiche-bg{padding:0.7em;} .gallery img{width:52px; height:52px;} .fiche-thumb{width:70px; height:70px;} }
+    /* ... (raccourci ici pour la lisibilité mais mets tout ton CSS !) ... */
   </style>
 </head>
 <body>
@@ -79,6 +30,8 @@
   <div class="modal-date" id="modalDate"></div>
   <button class="modal-close" onclick="closeModal(event)">Fermer</button>
 </div>
+
+<!-- CHARGEMENT DES SCRIPTS UNIQUEMENT ICI, EN BAS -->
 <script src="https://unpkg.com/@supabase/supabase-js"></script>
 <script>
 const supabase = supabase.createClient(
