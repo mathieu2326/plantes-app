@@ -2,356 +2,430 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Carnet Plantes</title>
+  <title>Carnet de Plantes</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Nunito', sans-serif;
+      font-family: 'Montserrat', Arial, sans-serif;
       margin: 0; padding: 0;
-      background: #f6fcf6;
+      background: #f5faf6;
+      color: #224c30;
     }
     header {
-      background: #51b86c;
-      color: white;
-      padding: 1.5rem 0 1rem 0;
+      background: #56ba75;
+      color: #fff;
+      padding: 2rem 0 1.2rem 0;
       text-align: center;
       border-radius: 0 0 2rem 2rem;
-      margin-bottom: 1rem;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 4px 18px #7ddba643;
     }
     .container {
-      max-width: 550px;
+      max-width: 780px;
       margin: auto;
-      padding: 1rem;
+      padding: 1.2rem 1rem 3rem 1rem;
+    }
+    .search-bar {
+      display: flex; gap: 1rem; align-items: center;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .search-bar input {
+      font-size: 1.05em;
+      border-radius: 0.7em;
+      border: 1px solid #bdddb8;
+      padding: 0.55em 1em;
+      flex: 1;
+      min-width: 200px;
+    }
+    .btn-add {
+      background: #48be6b;
+      color: #fff;
+      border: none;
+      border-radius: 1.8em;
+      padding: 0.65em 1.8em;
+      font-size: 1.17em;
+      font-weight: 700;
+      margin: 0 0.2em;
+      cursor: pointer;
+      transition: background .17s;
+    }
+    .btn-add:hover { background: #2a9247; }
+    .plants-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(285px, 1fr));
+      gap: 1.3rem;
     }
     .plant-card {
-      display: flex;
+      background: #fff;
+      border-radius: 1.3rem;
+      box-shadow: 0 2px 10px #b3e1c74a;
+      display: flex; gap: 1.2em;
       align-items: center;
-      background: #e8fbe4;
-      border-radius: 1rem;
-      padding: 0.8rem;
-      margin-bottom: 1.2rem;
-      box-shadow: 0 2px 8px #0001;
-      transition: box-shadow .2s;
+      padding: 1.1em 1.1em;
+      position: relative;
+      min-height: 95px;
       cursor: pointer;
+      transition: box-shadow .17s;
     }
-    .plant-card:hover { box-shadow: 0 4px 12px #0002; }
-    .plant-photo-thumb {
-      width: 60px; height: 60px; object-fit: cover;
-      border-radius: 1rem; background: #fff;
-      margin-right: 1rem;
-      border: 1.5px solid #b4dfbe;
+    .plant-card:hover { box-shadow: 0 6px 16px #95dab133; }
+    .plant-thumb {
+      width: 64px; height: 64px; object-fit: cover;
+      border-radius: 1em;
+      background: #ecf9f1;
+      border: 1.5px solid #c2eac6;
+      display: block;
     }
-    .plant-main {
-      flex: 1;
+    .thumb-default {
+      display: flex; align-items: center; justify-content: center;
+      width: 64px; height: 64px;
+      border-radius: 1em;
+      background: #e0f4e6;
+      color: #6ec284; font-size: 2em;
+      border: 1.5px solid #c2eac6;
     }
-    .btn-add, .btn-back, .btn-delete {
-      background: #51b86c;
-      color: white;
-      border: none;
-      border-radius: 2rem;
-      padding: 0.6rem 1.4rem;
-      font-size: 1rem;
-      margin: 0.3rem 0.4rem;
-      cursor: pointer;
-      transition: background .2s;
+    .plant-info { flex: 1; }
+    .plant-name {
+      font-size: 1.17em; font-weight: bold;
+      margin-bottom: 0.1em;
+      color: #23533d;
     }
-    .btn-add:hover { background: #388e4e; }
-    .btn-back { background: #dedede; color: #168942; }
-    .btn-delete { background: #eb5b5b; }
-    .gallery {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-top: 1rem;
+    .plant-dates {
+      font-size: 0.97em;
+      color: #487656;
+      margin-bottom: 0.4em;
     }
-    .gallery-img-block {
-      width: 120px;
-      display: flex; flex-direction: column; align-items: center;
-      background: #f6f9f6;
-      border-radius: 1rem; box-shadow: 0 1px 3px #0001;
-      padding: 0.5rem 0.4rem;
-      margin-bottom: 0.5rem;
+    .arrosage-today {
+      color: #fff;
+      background: #44bb4c;
+      border-radius: 0.8em;
+      font-size: 0.95em;
+      padding: 2px 13px;
+      margin-left: 0.8em;
+      font-weight: 600;
     }
-    .gallery-img {
-      width: 95px; height: 95px; object-fit: cover;
-      border-radius: 0.8rem;
-      cursor: pointer;
-      margin-bottom: 0.3rem;
-      border: 1px solid #bde3ca;
-      transition: box-shadow .2s;
+    .plant-actions {
+      display: flex; gap: 7px; margin-top: 0.4em;
     }
-    .gallery-img:hover { box-shadow: 0 4px 8px #b2ffd8aa; }
-    .gallery-caption { font-size: .90em; color: #334; margin-bottom: 2px; text-align: center;}
-    .gallery-date { font-size: .80em; color: #888; margin-bottom: 4px; text-align: center;}
-    .gallery-delete-btn {
-      background: #eb5b5b; color: white; border: none; border-radius: 100px; cursor: pointer;
-      font-size: 1em; margin-bottom: 3px; padding: 2px 9px;
-      align-self: flex-end;
+    .btn-edit, .btn-delete {
+      border: none; border-radius: 8px; font-size: .97em; font-weight: 600; cursor: pointer; padding: 7px 12px;
+      box-shadow: 0 1px 7px #c5dece38;
+      transition: background .13s;
     }
-    @media (max-width: 650px) {
-      .container { padding: 0.2rem; }
-      .gallery-img-block { width: 45vw; min-width: 80px;}
-      .gallery-img { width: 39vw; height: 39vw; }
+    .btn-edit { background: #e0f7e9; color: #168942; }
+    .btn-edit:hover { background: #b8f2c7; }
+    .btn-delete { background: #f16868; color: #fff; }
+    .btn-delete:hover {background:#be3030;}
+    .arrosage-check {
+      accent-color: #44bb4c;
+      transform: scale(1.18);
+      margin-right: 4px;
+      margin-left: 0.8em;
     }
-    .modal-bg {
-      display: none; position: fixed; z-index: 40; left: 0; top: 0; width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.7); align-items: center; justify-content: center;
+    .edit-date {
+      border: 1px solid #bdddb8;
+      border-radius: 0.6em;
+      font-size: 1em;
+      padding: 2px 7px;
+      margin-left: 7px;
+      margin-bottom: 1px;
     }
+    .fiche-bg {
+      background: #f7faf7f7;
+      border-radius: 1.1em;
+      box-shadow: 0 3px 16px #b2bfa84b;
+      padding: 1.6em 1.1em 1.1em 1.1em;
+      max-width: 510px;
+      margin: 24px auto 0 auto;
+      position: relative;
+    }
+    .fiche-title { font-size: 1.38em; font-weight: 700; color: #24422b; text-align: center; }
+    .fiche-thumb {
+      width: 120px; height: 120px; object-fit: cover;
+      border-radius: 1.1em; background: #eafaea;
+      box-shadow: 0 1px 8px #b2bfa866;
+      display: block; margin: 0 auto 13px auto;
+    }
+    .fiche-notes {
+      margin: 12px 0 10px 0; color: #34643c;
+      background: #eafaea; border-radius: 8px; padding: 7px 10px;
+      min-height: 28px; font-size: 1.01em; text-align: center;
+    }
+    .fiche-actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 10px; margin-top: 8px; }
+    .fiche-btn { background: #7dd8a3; color: #fff; border: none; border-radius: 8px; padding: 7px 19px; cursor: pointer; font-size: 1.08em; font-weight: 600; transition: background .17s;}
+    .fiche-btn:hover {background: #47b16c;}
+    .fiche-label {font-size: 1em; margin-top: 0.9em; color: #1e5832;}
+    .fiche-field { margin-bottom: 0.7em; }
+    .gallery-title { margin-top: 15px; margin-bottom: 4px; font-weight: 600; font-size: 1.09em; color: #377a49; text-align: center;}
+    .gallery { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-bottom: 7px;}
+    .gallery-item { position: relative; display: inline-block;}
+    .gallery img { border-radius: 10px; width: 78px; height: 78px; object-fit: cover; cursor: pointer; border: 2px solid #c2e3ca; background: #eafaea; }
+    .del-photo-btn {
+      position: absolute; top: -8px; right: -8px; background: #f16868;
+      color: #fff; font-weight: bold; border: none; width: 23px; height: 23px; font-size: 1.11em; border-radius: 50%; cursor: pointer; padding:0; z-index: 3;
+    }
+    .photo-desc { font-size: 0.97em; color: #437c56; background: #eafaea; border-radius: 6px; padding: 2px 5px; margin: 4px 0 2px 0; text-align: center;}
+    .gallery-counter { margin: 4px 0 10px 0; color: #457853; font-size: 1.02em; font-weight: 500; text-align: center;}
+    .photo-date { font-size: 0.88em; color: #7fa88f; margin-bottom: 2px; text-align: center;}
+    .modal-bg { position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(34, 52, 30, 0.95); display:none; align-items:center; justify-content:center; flex-direction:column; z-index: 9999;}
     .modal-bg.active { display: flex; }
-    .modal-img-content {
-      background: white; border-radius: 1rem; padding: 1.2rem; text-align: center; max-width: 95vw; max-height: 90vh;
-      display: flex; flex-direction: column; align-items: center;
-    }
-    .modal-img {
-      max-width: 65vw; max-height: 60vh; border-radius: 1rem; margin-bottom: 1rem;
-    }
-    .modal-caption { font-size: 1em; margin-bottom: 0.4rem; }
-    .modal-date { color: #888; font-size: .93em; }
-    .close-modal-btn {
-      background: #eb5b5b; color: white; border: none; border-radius: 100px; cursor: pointer;
-      font-size: 1.2em; padding: 3px 15px; position: absolute; top: 16px; right: 32px;
-    }
-    .form-section {
-      background: #fff; border-radius: 1rem; box-shadow: 0 1px 8px #0001; padding: 1.5rem; margin-bottom: 1.4rem;
-    }
-    .form-field { margin-bottom: 1rem; width: 100%; }
-    label { font-weight: bold; }
-    input, textarea {
-      width: 100%; padding: 0.5rem; border-radius: 0.7rem; border: 1px solid #b4dfbe;
-      font-family: 'Nunito', sans-serif; font-size: 1em; margin-top: 0.2rem;
-    }
-    .notes { color: #165d1b; font-size: 1em; }
-    .plantes-list-title {
-      margin-bottom: 0.6rem; color: #277541;
-      font-size: 1.1em; font-weight: 700;
+    .modal-img { max-width: 92vw; max-height: 83vh; border-radius: 16px; box-shadow: 0 4px 24px #86a68f; background: #fff; margin-bottom: 17px;}
+    .modal-desc, .modal-date { color: #fff; text-align: center; margin-bottom: 8px; font-size:1.08em;}
+    .modal-close { background: #fff; color:#285c34; border: none; border-radius: 10px; font-size: 1.12em; font-weight: 700; padding: 7px 19px; cursor: pointer; margin-top: 11px; box-shadow: 0 2px 8px #285c3427; transition: background .13s;}
+    .modal-close:hover {background:#e0f7e9;}
+    .form-section { background: #e8f5e1; border-radius: 13px; margin-bottom: 2.4em; padding: 18px 14px 9px 14px; box-shadow: 0 1px 6px #b2bfa8a8; max-width: 500px; margin-left:auto;margin-right:auto;}
+    input, textarea, select { width: 99%; padding: 8px; margin: 7px 0 16px 0; border-radius: 7px; border: 1px solid #bdddb8; font-size: 1em; font-family: inherit; background: #fafdfe; box-sizing: border-box;}
+    label {font-size:1.04em;}
+    .no-plantes { color: #87b29a; font-size: 1.2em; text-align: center; margin-top: 44px; letter-spacing: .5px;}
+    @media (max-width: 700px) {
+      .container { padding: 0.2rem; }
+      .plants-grid { gap: 0.7rem; }
+      .plant-card { gap: 0.6em; padding: 0.7em 0.7em;}
+      .fiche-bg { padding:0.7em; }
+      .gallery img { width: 52px; height: 52px;}
+      .fiche-thumb { width: 70px; height: 70px;}
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>🌱 Carnet Plantes</h1>
-    <div style="font-weight:400;margin-top:.5em;font-size:1.05em;">Ajoutez vos plantes, photos, arrosages, rempotages, notes…</div>
-  </header>
-  <div class="container" id="app">
-    <!-- Ici se génère toute l'app -->
+<header>
+  <h1>🌱 Carnet de Plantes</h1>
+  <div style="font-weight:400;margin-top:.7em;font-size:1.08em;">Gérez vos plantes, photos, arrosages, rempotages et notes !</div>
+</header>
+<div class="container">
+  <div class="search-bar">
+    <input id="searchInput" placeholder="🔎 Rechercher une plante..." oninput="renderListe()">
+    <button class="btn-add" onclick="showAddPlante()">+ Ajouter une plante</button>
   </div>
+  <div id="main"></div>
+</div>
+<!-- Modal pour photo agrandie -->
+<div class="modal-bg" id="modalBg" onclick="closeModal(event)">
+  <img id="modalImg" class="modal-img" src="">
+  <div class="modal-desc" id="modalCaption"></div>
+  <div class="modal-date" id="modalDate"></div>
+  <button class="modal-close" onclick="closeModal(event)">Fermer</button>
+</div>
+<script src="https://unpkg.com/@supabase/supabase-js"></script>
+<script>
+const supabase = supabase.createClient(
+  "https://jooyigpbgyzqldnwldmd.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impvb3lpZ3BiZ3l6cWxkbndsZG1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MzgxODQsImV4cCI6MjA2ODAxNDE4NH0.OAGlTtJ9k0IzzET95PODjrFzFR-q6Zhv71IvJeXetQQ"
+);
+const BUCKET = "plantes-photos";
 
-  <!-- Modal photo agrandie -->
-  <div class="modal-bg" id="modalBg" onclick="closeModal()">
-    <div class="modal-img-content" onclick="event.stopPropagation();">
-      <button class="close-modal-btn" onclick="closeModal()">&times;</button>
-      <img id="modalImg" class="modal-img" src="" alt="Photo plante">
-      <div class="modal-caption" id="modalCaption"></div>
-      <div class="modal-date" id="modalDate"></div>
-    </div>
-  </div>
+let plantes = [], photosByPlante = {}, currentPlante = null;
 
-  <script src="https://unpkg.com/@supabase/supabase-js"></script>
-  <script>
-    // ---- CONFIGURATION ----
-    const SUPABASE_URL = 'https://jooyigpbgyzqldnwldmd.supabase.co'; // <-- remplace par ton URL
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impvb3lpZ3BiZ3l6cWxkbndsZG1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MzgxODQsImV4cCI6MjA2ODAxNDE4NH0.OAGlTtJ9k0IzzET95PODjrFzFR-q6Zhv71IvJeXetQQ'; // <-- remplace par ta clé
-    const BUCKET = 'plantes-photos';
+async function loadPlantes() {
+  let { data } = await supabase.from('plantes').select('*').order('id', {ascending:false});
+  plantes = data || [];
+}
+async function loadPhotos() {
+  let { data } = await supabase.from('photos').select('*');
+  photosByPlante = {};
+  (data||[]).forEach(photo => {
+    if (!photosByPlante[photo.plante_id]) photosByPlante[photo.plante_id] = [];
+    photosByPlante[photo.plante_id].push(photo);
+  });
+}
+function formatDate(d) {
+  if (!d) return "";
+  const date = new Date(d);
+  if (isNaN(date)) return "";
+  return date.toLocaleDateString();
+}
+function daysSince(dateString) {
+  if (!dateString) return null;
+  const d = new Date(dateString);
+  const now = new Date();
+  return Math.floor((now - d) / (1000*60*60*24));
+}
+function escapeHtml(str) {
+  return (str || "").replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
 
-    // Remplace ces valeurs ↑ (garde-les confidentielles côté vrai projet, ici c’est pour Github Pages only)
-
-    // ---- INIT ----
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // ---- RENDER APP ----
-    let plantes = [];
-    let photos = [];
-    let currentPlanteId = null;
-
-    document.addEventListener('DOMContentLoaded', initApp);
-
-    async function initApp() {
-      await fetchPlantes();
-      renderPlantesList();
-    }
-
-    // ---- API ----
-    async function fetchPlantes() {
-      let { data, error } = await supabase.from('plantes').select('*').order('date_ajout', {ascending: false});
-      plantes = data || [];
-    }
-    async function fetchPhotos(plante_id) {
-      let { data, error } = await supabase.from('photos').select('*').eq('plante_id', plante_id).order('date_ajout', {ascending: false});
-      photos = data || [];
-    }
-    async function addPlante(obj) {
-      let { data, error } = await supabase.from('plantes').insert([obj]);
-      return data ? data[0] : null;
-    }
-    async function deletePlante(id) {
-      await supabase.from('plantes').delete().eq('id', id);
-    }
-    async function addPhoto(plante_id, file, caption) {
-      // 1. Upload dans le bucket Supabase
-      const ext = file.name.split('.').pop();
-      const fileName = `${plante_id}_${Date.now()}.${ext}`;
-      let { data, error: errUp } = await supabase.storage.from(BUCKET).upload(fileName, file);
-      if (errUp) return alert("Erreur upload photo");
-      // 2. Stocker dans la table photos (url, caption, date)
-      let url = supabase.storage.from(BUCKET).getPublicUrl(fileName).publicUrl;
-      let { data: res, error: errInsert } = await supabase.from('photos').insert([{ plante_id, url, caption, date_ajout: new Date() }]);
-      if (errInsert) return alert("Erreur DB photo");
-      return res ? res[0] : null;
-    }
-    async function deletePhoto(photoId, url) {
-      // 1. Supprime DB
-      await supabase.from('photos').delete().eq('id', photoId);
-      // 2. Supprime storage
-      let path = url.split('/').slice(-1)[0];
-      await supabase.storage.from(BUCKET).remove([path]);
-    }
-
-    // ---- UI RENDER ----
-    function renderPlantesList() {
-      currentPlanteId = null;
-      let html = `
-        <div class="form-section">
-          <div class="plantes-list-title">Ajouter une plante</div>
-          <form onsubmit="return handleAddPlante(event)">
-            <div class="form-field"><label>Nom de la plante</label><input required id="planteNom"></div>
-            <div class="form-field"><label>Photo principale</label><input type="file" id="plantePhoto"></div>
-            <div class="form-field"><label>Date dernier arrosage</label><input type="date" id="dateArrosage"></div>
-            <div class="form-field"><label>Date dernier rempotage</label><input type="date" id="dateRempotage"></div>
-            <div class="form-field"><label>Notes</label><textarea id="planteNotes"></textarea></div>
-            <button class="btn-add" type="submit">Ajouter la plante</button>
-          </form>
-        </div>
-        <div class="plantes-list-title">Mes plantes (${plantes.length})</div>
-        ${plantes.length === 0 ? "<p>Aucune plante enregistrée.</p>" : ""}
-        ${plantes.map(plante => `
-          <div class="plant-card" onclick="handleShowPlante(${plante.id})">
-            <img class="plant-photo-thumb" src="${plante.photo_url || 'https://cdn-icons-png.flaticon.com/512/2909/2909765.png'}" alt="">
-            <div class="plant-main">
-              <div style="font-weight:700;font-size:1.18em">${plante.nom}</div>
-              <div style="color:#34814e;font-size:0.98em">
-                💧 ${plante.date_arrosage ? 'Arrosée le ' + plante.date_arrosage : 'Pas encore arrosée'}<br>
-                🌱 ${plante.date_rempotage ? 'Rempotée le ' + plante.date_rempotage : 'Jamais rempotée'}
-              </div>
-              <div style="font-size:0.95em;color:#444">${plante.notes ? plante.notes : ''}</div>
-            </div>
-          </div>
-        `).join('')}
-      `;
-      document.getElementById('app').innerHTML = html;
-    }
-
-    async function handleAddPlante(e) {
-      e.preventDefault();
-      let nom = document.getElementById('planteNom').value.trim();
-      let photoInput = document.getElementById('plantePhoto');
-      let date_arrosage = document.getElementById('dateArrosage').value;
-      let date_rempotage = document.getElementById('dateRempotage').value;
-      let notes = document.getElementById('planteNotes').value;
-      let obj = { nom, date_arrosage, date_rempotage, notes, date_ajout: new Date() };
-      let photoUrl = '';
-      // upload photo principale
-      if(photoInput.files.length) {
-        let file = photoInput.files[0];
-        const ext = file.name.split('.').pop();
-        const fileName = `main_${nom.replace(/\s/g,'_')}_${Date.now()}.${ext}`;
-        let { data, error } = await supabase.storage.from(BUCKET).upload(fileName, file);
-        if (!error) photoUrl = supabase.storage.from(BUCKET).getPublicUrl(fileName).publicUrl;
-        obj.photo_url = photoUrl;
+async function refreshAll() {
+  await loadPlantes();
+  await loadPhotos();
+  renderListe();
+}
+function renderListe() {
+  let search = (document.getElementById('searchInput')||{}).value?.toLowerCase() || "";
+  let toShow = plantes.filter(p => p.nom?.toLowerCase().includes(search));
+  let html = `<div class="plants-grid">`;
+  if (!toShow.length) html += `<div class="no-plantes">Aucune plante enregistrée.</div>`;
+  else toShow.forEach(pl => {
+    let phs = (photosByPlante[pl.id]||[]);
+    html += `<div class="plant-card" onclick="showFiche(${pl.id})">
+      ${phs.length
+        ? `<img src="${escapeHtml(phs[0].url)}" class="plant-thumb" alt="">`
+        : `<div class="thumb-default">🌱</div>`
       }
-      let newPlante = await addPlante(obj);
-      await fetchPlantes();
-      renderPlantesList();
-    }
-
-    async function handleShowPlante(id) {
-      currentPlanteId = id;
-      let plante = plantes.find(p=>p.id === id);
-      await fetchPhotos(id);
-      // Affiche fiche plante + galerie
-      let html = `
-        <button class="btn-back" onclick="initApp()">&larr; Revenir à la liste</button>
-        <div class="form-section">
-          <div style="display:flex;align-items:center;gap:1rem;">
-            <img class="plant-photo-thumb" src="${plante.photo_url || 'https://cdn-icons-png.flaticon.com/512/2909/2909765.png'}" alt="">
-            <div>
-              <div style="font-weight:700;font-size:1.22em">${plante.nom}</div>
-              <div style="color:#277541;font-size:0.99em">
-                💧 Dernier arrosage : <b>${plante.date_arrosage || '-'}</b><br>
-                🌱 Dernier rempotage : <b>${plante.date_rempotage || '-'}</b>
-              </div>
-              <div style="font-size:.97em;color:#444;margin-top:.2em">${plante.notes ? plante.notes : ''}</div>
-              <button class="btn-delete" onclick="handleDeletePlante(${plante.id});event.stopPropagation();">Supprimer</button>
-            </div>
-          </div>
+      <div class="plant-info">
+        <div class="plant-name">${escapeHtml(pl.nom||"")}</div>
+        <div class="plant-dates">
+          💧 Arrosage : <span>${pl.date_arrosage?formatDate(pl.date_arrosage):"–"}</span>
+          <input type="date" class="edit-date" value="${pl.date_arrosage||""}" onchange="updateArrosage(${pl.id},this.value);event.stopPropagation()">
+          ${daysSince(pl.date_arrosage)===0 ? '<span class="arrosage-today">À arroser aujourd’hui</span>' : ""}
         </div>
-        <div class="form-section">
-          <div style="font-weight:700;font-size:1.15em;color:#277541;margin-bottom:0.7em;">Galerie photo / vidéo</div>
-          <form onsubmit="return handleAddPhoto(event,${plante.id})" style="margin-bottom:.8em;">
-            <input type="file" required id="newPhotoFile">
-            <input style="margin-top:.3em;" type="text" id="newPhotoCaption" placeholder="Description ou notes (facultatif)">
-            <button class="btn-add" type="submit">Ajouter photo/vidéo</button>
-          </form>
-          <div class="gallery">
-            ${photos.length === 0 ? '<div>Aucune photo enregistrée.</div>' : photos.map(photo=>`
-              <div class="gallery-img-block">
-                <img class="gallery-img" src="${photo.url}" alt="" onclick="showModal('${photo.url}','${photo.caption || ''}','${photo.date_ajout ? (new Date(photo.date_ajout)).toLocaleString('fr-CA') : ''}')">
-                <div class="gallery-date">${photo.date_ajout ? (new Date(photo.date_ajout)).toLocaleDateString('fr-CA') : ''}</div>
-                <div class="gallery-caption">${photo.caption || ''}</div>
-                <button class="gallery-delete-btn" onclick="handleDeletePhoto(${photo.id},'${photo.url}');event.stopPropagation();">&times;</button>
-              </div>
-            `).join('')}
-          </div>
+        <div class="plant-dates">
+          🌱 Rempotage : <span>${pl.date_rempotage?formatDate(pl.date_rempotage):"–"}</span>
+          <input type="date" class="edit-date" value="${pl.date_rempotage||""}" onchange="updateRempotage(${pl.id},this.value);event.stopPropagation()">
         </div>
-      `;
-      document.getElementById('app').innerHTML = html;
-    }
+      </div>
+      <div class="plant-actions">
+        <button class="btn-edit" onclick="editPlante(${pl.id});event.stopPropagation();">Modifier</button>
+        <button class="btn-delete" onclick="deletePlante(${pl.id});event.stopPropagation();">Supprimer</button>
+      </div>
+    </div>`;
+  });
+  html += "</div>";
+  document.getElementById('main').innerHTML = html;
+}
+function showAddPlante() {
+  let html = `
+    <div class="form-section">
+      <form onsubmit="return savePlante(event)">
+        <label>Nom de la plante
+          <input type="text" id="nomAjout" required maxlength="80" placeholder="ex : Monstera, Ficus, etc.">
+        </label>
+        <label>Notes, besoins, évolution
+          <textarea id="notesAjout" maxlength="400" placeholder="Observations, conseils, lumière, etc."></textarea>
+        </label>
+        <label>Date d'arrosage
+          <input type="date" id="arrosageAjout">
+        </label>
+        <label>Date de rempotage
+          <input type="date" id="rempotageAjout">
+        </label>
+        <button class="fiche-btn" type="submit">Ajouter</button>
+        <button class="fiche-btn" type="button" onclick="refreshAll()">Annuler</button>
+      </form>
+    </div>
+  `;
+  document.getElementById('main').innerHTML = html;
+}
+async function savePlante(ev) {
+  ev.preventDefault();
+  let nom = document.getElementById('nomAjout').value.trim();
+  if (!nom) return alert("Nom obligatoire");
+  let notes = document.getElementById('notesAjout').value.trim();
+  let date_arrosage = document.getElementById('arrosageAjout').value;
+  let date_rempotage = document.getElementById('rempotageAjout').value;
+  let { error } = await supabase.from("plantes").insert({
+    nom, notes, date_arrosage, date_rempotage
+  });
+  if (error) return alert("Erreur: "+error.message);
+  await refreshAll();
+  return false;
+}
+function showFiche(id) {
+  currentPlante = plantes.find(p=>p.id===id);
+  let phs = photosByPlante[id]||[];
+  let html = `
+    <div class="fiche-bg">
+      <button class="fiche-btn" onclick="refreshAll()">← Retour à la liste</button>
+      <div class="fiche-title">${escapeHtml(currentPlante.nom)}</div>
+      ${phs.length
+        ? `<img src="${escapeHtml(phs[0].url)}" class="fiche-thumb" alt="">`
+        : `<div class="thumb-default" style="margin:0 auto 13px auto;font-size:3em;width:120px;height:120px;">🌱</div>`
+      }
+      <div class="fiche-field"><b>Notes :</b>
+        <textarea id="ficheNotes" maxlength="400" style="min-height:55px;">${escapeHtml(currentPlante.notes||"")}</textarea>
+      </div>
+      <div class="fiche-field">
+        <b>Date d'arrosage :</b> <input type="date" id="ficheArrosage" value="${currentPlante.date_arrosage||""}">
+      </div>
+      <div class="fiche-field">
+        <b>Date de rempotage :</b> <input type="date" id="ficheRempotage" value="${currentPlante.date_rempotage||""}">
+      </div>
+      <div class="fiche-actions">
+        <button class="fiche-btn" onclick="saveEditFiche()">Enregistrer</button>
+        <button class="fiche-btn" onclick="deletePlante(${id})">Supprimer</button>
+      </div>
+      <div class="gallery-title">Galerie photos (${phs.length})</div>
+      <form id="photoUploadForm" style="text-align:center; margin-bottom:13px;" enctype="multipart/form-data">
+        <input type="file" id="photoInput" accept="image/*" required>
+        <input type="text" id="descInput" placeholder="Description (facultatif)" style="width:80%;max-width:220px;display:inline-block;">
+        <button class="fiche-btn" type="submit">Ajouter une photo</button>
+      </form>
+      <div class="gallery-counter">${phs.length ? phs.length+" photo(s)" : "Aucune photo"}</div>
+      <div class="gallery">`;
+  phs.forEach(photo=>{
+    html += `<div class="gallery-item">
+      <img src="${escapeHtml(photo.url)}" alt="" onclick="openModal('${escapeHtml(photo.url)}','${escapeHtml(photo.description||photo.caption||"")}', '${photo.date_ajout ? formatDate(photo.date_ajout) : ""}')">
+      <div class="photo-desc">${escapeHtml(photo.description||photo.caption||"")}</div>
+      <div class="photo-date">${photo.date_ajout ? formatDate(photo.date_ajout) : ""}</div>
+      <button class="del-photo-btn" onclick="deletePhoto(${photo.id},${id});event.stopPropagation()">×</button>
+    </div>`;
+  });
+  html += `</div></div>`;
+  document.getElementById('main').innerHTML = html;
 
-    async function handleAddPhoto(e,plante_id) {
-      e.preventDefault();
-      let fileInput = document.getElementById('newPhotoFile');
-      let caption = document.getElementById('newPhotoCaption').value;
-      if(!fileInput.files.length) return false;
-      await addPhoto(plante_id, fileInput.files[0], caption);
-      await fetchPhotos(plante_id);
-      handleShowPlante(plante_id);
-      return false;
-    }
-    async function handleDeletePlante(id) {
-      if(!confirm("Supprimer cette plante ?")) return;
-      await deletePlante(id);
-      await fetchPlantes();
-      renderPlantesList();
-    }
-    async function handleDeletePhoto(id,url) {
-      if(!confirm("Supprimer cette photo ?")) return;
-      await deletePhoto(id,url);
-      await fetchPhotos(currentPlanteId);
-      handleShowPlante(currentPlanteId);
-    }
-
-    // ---- MODAL GESTION ----
-    function showModal(url,caption,date) {
-      document.getElementById('modalBg').classList.add('active');
-      document.getElementById('modalImg').src = url;
-      document.getElementById('modalCaption').textContent = caption;
-      document.getElementById('modalDate').textContent = date ? `Ajoutée le ${date}` : '';
-    }
-    function closeModal() {
-      document.getElementById('modalBg').classList.remove('active');
-      document.getElementById('modalImg').src = '';
-      document.getElementById('modalCaption').textContent = '';
-      document.getElementById('modalDate').textContent = '';
-    }
-
-    // Pour éviter les conflits de scope
-    window.handleAddPlante = handleAddPlante;
-    window.handleShowPlante = handleShowPlante;
-    window.handleAddPhoto = handleAddPhoto;
-    window.handleDeletePlante = handleDeletePlante;
-    window.handleDeletePhoto = handleDeletePhoto;
-    window.showModal = showModal;
-    window.closeModal = closeModal;
-  </script>
+  document.getElementById('photoUploadForm').onsubmit = async function(ev){
+    ev.preventDefault();
+    const file = document.getElementById('photoInput').files[0];
+    const description = document.getElementById('descInput').value.trim();
+    if(!file) return;
+    const filePath = `${id}/${Date.now()}_${file.name.replace(/[^a-z0-9_.-]/gi, '_')}`;
+    let { error } = await supabase.storage.from(BUCKET).upload(filePath, file, { upsert:false });
+    if(error){ alert("Erreur upload: "+error.message); return; }
+    const { data } = supabase.storage.from(BUCKET).getPublicUrl(filePath);
+    await supabase.from("photos").insert({
+      plante_id: id, url: data.publicUrl, storage_key: filePath,
+      description, date_ajout: new Date()
+    });
+    await loadPhotos(); showFiche(id);
+  }
+}
+async function saveEditFiche() {
+  if (!currentPlante) return;
+  let notes = document.getElementById('ficheNotes').value.trim();
+  let date_arrosage = document.getElementById('ficheArrosage').value;
+  let date_rempotage = document.getElementById('ficheRempotage').value;
+  let { error } = await supabase.from("plantes").update({
+    notes, date_arrosage, date_rempotage
+  }).eq("id", currentPlante.id);
+  if (error) return alert("Erreur: "+error.message);
+  await refreshAll();
+}
+async function editPlante(id) { showFiche(id); }
+async function deletePlante(id) {
+  if(!confirm("Supprimer cette plante et toutes ses photos ?")) return;
+  await supabase.from("photos").delete().eq("plante_id",id);
+  await supabase.from("plantes").delete().eq("id",id);
+  await refreshAll();
+}
+async function updateArrosage(id,date) {
+  await supabase.from("plantes").update({date_arrosage:date}).eq("id",id);
+  await refreshAll();
+}
+async function updateRempotage(id,date) {
+  await supabase.from("plantes").update({date_rempotage:date}).eq("id",id);
+  await refreshAll();
+}
+async function deletePhoto(photo_id, plante_id){
+  if(!confirm("Supprimer cette photo ?")) return;
+  await supabase.from("photos").delete().eq("id",photo_id);
+  await loadPhotos(); showFiche(plante_id);
+}
+function openModal(url, desc, date) {
+  let modal = document.getElementById('modalBg');
+  document.getElementById('modalImg').src = url;
+  document.getElementById('modalCaption').textContent = desc||"";
+  document.getElementById('modalDate').textContent = date ? "Ajoutée le "+date : "";
+  modal.classList.add('active');
+  document.body.style.overflow = "hidden";
+}
+function closeModal(ev){
+  if(ev && ev.target && !ev.target.classList.contains("modal-close") && !ev.target.classList.contains("modal-bg")) return;
+  document.getElementById('modalBg').classList.remove('active');
+  document.body.style.overflow = "auto";
+}
+refreshAll();
+</script>
 </body>
 </html>
